@@ -75,7 +75,7 @@
 	NSString * feedUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"feedUrl"];
 	if (!feedUrl)
 	{
-		feedUrl = @"http://announcer.heroku.com/dummy.json";
+		feedUrl = @"http://announcer.heroku.com/sample_feed.json";
 	}
 	
 	cell.textLabel.text = @"Feed";

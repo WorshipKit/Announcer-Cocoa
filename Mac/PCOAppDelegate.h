@@ -8,18 +8,11 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import <UIKit/UIKit.h>
-#import <UIKit/UIKitView.h>
-
-#import "PCOAnnouncerController.h"
+#import "PCOAnnouncerWindowController.h"
 
 @interface PCOAppDelegate : NSObject <NSApplicationDelegate>
 {
-	PCOAnnouncerController * announcerController;
+	PCOAnnouncerWindowController * announcerController;
+	
 }
-
-@property (assign) IBOutlet NSWindow *window;
-
-@property (assign) IBOutlet UIKitView * mainUIKitView;
-
 @end

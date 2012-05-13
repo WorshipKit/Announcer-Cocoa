@@ -13,8 +13,27 @@
 @interface PCOAnnouncerController : NSObject
 {
 	UINavigationController * mainNavigationController;
+	
+	NSString * logoUrl;
+	NSArray * announcements;
+	
+	NSArray * flickrImageUrls;
 }
 
++ (NSString *)localCacheDirectoryPath;
+
+
 - (UIViewController *)viewController;
+
+
+- (void)loadAnnouncementsFromFeedLocation:(NSString *)feedUrl withCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))error;
+
+- (void)loadFlickrFeedFromLocation:(NSString *)feedUrl withCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))errorBlock;
+
+
+@property (nonatomic, strong) NSString * logoUrl;
+@property (nonatomic, strong) NSArray * announcements;
+
+@property (nonatomic, strong) NSArray * flickrImageUrls;
 
 @end

@@ -10,18 +10,12 @@
 
 @implementation PCOAppDelegate
 
-@synthesize window = _window;
-@synthesize mainUIKitView;
-
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	// Insert code here to initialize your application
 	
-	announcerController = [[PCOAnnouncerController alloc] init];
-	
-	[self.mainUIKitView UIWindow].rootViewController = [announcerController viewController];
-	
-	
+	announcerController = [[PCOAnnouncerWindowController alloc] init];
+	[announcerController showWindow:self];
 }
 
 @end

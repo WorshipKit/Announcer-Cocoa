@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		58D87AAE155ECEB2004027CD /* PCOAnnouncerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 58D87AAC155ECEB2004027CD /* PCOAnnouncerWindowController.m */; };
+		58D87AAF155ECEB2004027CD /* PCOAnnouncerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 58D87AAD155ECEB2004027CD /* PCOAnnouncerWindowController.xib */; };
+		58D87AB3155EDA28004027CD /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 58D87AB2155EDA28004027CD /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		58D87AB4155EDA28004027CD /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 58D87AB2155EDA28004027CD /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		58D87ACC155EE92E004027CD /* RKXMLParserLibXML.m in Sources */ = {isa = PBXBuildFile; fileRef = 58D87ACB155EE92E004027CD /* RKXMLParserLibXML.m */; };
+		58D87ACD155EE92E004027CD /* RKXMLParserLibXML.m in Sources */ = {isa = PBXBuildFile; fileRef = 58D87ACB155EE92E004027CD /* RKXMLParserLibXML.m */; };
+		58D87AE5155EEA0A004027CD /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 58D87AE4155EEA0A004027CD /* libxml2.dylib */; };
 		960A5BA615535BE300DB4EB9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960A5BA515535BE300DB4EB9 /* UIKit.framework */; };
 		960A5BA815535BE300DB4EB9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960A5BA715535BE300DB4EB9 /* Foundation.framework */; };
 		960A5BAA15535BE300DB4EB9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960A5BA915535BE300DB4EB9 /* CoreGraphics.framework */; };
@@ -71,6 +78,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		58D87AAB155ECEB2004027CD /* PCOAnnouncerWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PCOAnnouncerWindowController.h; path = Mac/PCOAnnouncerWindowController.h; sourceTree = SOURCE_ROOT; };
+		58D87AAC155ECEB2004027CD /* PCOAnnouncerWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PCOAnnouncerWindowController.m; path = Mac/PCOAnnouncerWindowController.m; sourceTree = SOURCE_ROOT; };
+		58D87AAD155ECEB2004027CD /* PCOAnnouncerWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = PCOAnnouncerWindowController.xib; path = Mac/PCOAnnouncerWindowController.xib; sourceTree = SOURCE_ROOT; };
+		58D87AB1155EDA28004027CD /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
+		58D87AB2155EDA28004027CD /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
+		58D87ACA155EE92E004027CD /* RKXMLParserLibXML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKXMLParserLibXML.h; sourceTree = "<group>"; };
+		58D87ACB155EE92E004027CD /* RKXMLParserLibXML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKXMLParserLibXML.m; sourceTree = "<group>"; };
+		58D87AE4155EEA0A004027CD /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/usr/lib/libxml2.dylib; sourceTree = DEVELOPER_DIR; };
 		960A5BA115535BE300DB4EB9 /* Announcer iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Announcer iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		960A5BA515535BE300DB4EB9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		960A5BA715535BE300DB4EB9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -137,6 +152,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				58D87AE5155EEA0A004027CD /* libxml2.dylib in Frameworks */,
 				960A5C6A155363E500DB4EB9 /* UIKit.framework in Frameworks */,
 				960A5BF515535E5800DB4EB9 /* Cocoa.framework in Frameworks */,
 			);
@@ -154,9 +170,28 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		58D87AB0155EDA0D004027CD /* JSONKit */ = {
+			isa = PBXGroup;
+			children = (
+				58D87AB1155EDA28004027CD /* JSONKit.h */,
+				58D87AB2155EDA28004027CD /* JSONKit.m */,
+			);
+			name = JSONKit;
+			sourceTree = "<group>";
+		};
+		58D87AC9155EE91E004027CD /* XML */ = {
+			isa = PBXGroup;
+			children = (
+				58D87ACA155EE92E004027CD /* RKXMLParserLibXML.h */,
+				58D87ACB155EE92E004027CD /* RKXMLParserLibXML.m */,
+			);
+			name = XML;
+			sourceTree = "<group>";
+		};
 		960A5B9615535BE300DB4EB9 = {
 			isa = PBXGroup;
 			children = (
+				58D87AE4155EEA0A004027CD /* libxml2.dylib */,
 				960A5C2515535ECC00DB4EB9 /* Shared */,
 				960A5BAB15535BE300DB4EB9 /* iOS */,
 				960A5BFA15535E5800DB4EB9 /* Mac */,
@@ -247,6 +282,9 @@
 			children = (
 				960A5C581553613E00DB4EB9 /* PCOAppDelegate.h */,
 				960A5C571553613E00DB4EB9 /* PCOAppDelegate.m */,
+				58D87AAB155ECEB2004027CD /* PCOAnnouncerWindowController.h */,
+				58D87AAC155ECEB2004027CD /* PCOAnnouncerWindowController.m */,
+				58D87AAD155ECEB2004027CD /* PCOAnnouncerWindowController.xib */,
 				960A5BFB15535E5800DB4EB9 /* Supporting Files */,
 			);
 			name = Mac;
@@ -289,6 +327,8 @@
 		960A5C2515535ECC00DB4EB9 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				58D87AC9155EE91E004027CD /* XML */,
+				58D87AB0155EDA0D004027CD /* JSONKit */,
 				960A5C43155360E800DB4EB9 /* UIKit.xcodeproj */,
 				960A5CA315536A2E00DB4EB9 /* PCOAnnouncerController.h */,
 				960A5CA415536A2E00DB4EB9 /* PCOAnnouncerController.m */,
@@ -463,6 +503,7 @@
 				960A5C651553615100DB4EB9 /* InfoPlist.strings in Resources */,
 				960A5C661553615100DB4EB9 /* Credits.rtf in Resources */,
 				960A5C671553615100DB4EB9 /* Announcer Mac-Info.plist in Resources */,
+				58D87AAF155ECEB2004027CD /* PCOAnnouncerWindowController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -515,6 +556,8 @@
 				960A5C541553612800DB4EB9 /* main.m in Sources */,
 				960A5CA515536A2F00DB4EB9 /* PCOAnnouncerController.m in Sources */,
 				960A5CC315536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m in Sources */,
+				58D87AB3155EDA28004027CD /* JSONKit.m in Sources */,
+				58D87ACC155EE92E004027CD /* RKXMLParserLibXML.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -534,6 +577,9 @@
 				960A5C631553615100DB4EB9 /* main.m in Sources */,
 				960A5CA615536A2F00DB4EB9 /* PCOAnnouncerController.m in Sources */,
 				960A5CC415536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m in Sources */,
+				58D87AAE155ECEB2004027CD /* PCOAnnouncerWindowController.m in Sources */,
+				58D87AB4155EDA28004027CD /* JSONKit.m in Sources */,
+				58D87ACD155EE92E004027CD /* RKXMLParserLibXML.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -638,6 +684,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "${SDKROOT}/usr/include/libxml2";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -658,6 +705,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "${SDKROOT}/usr/include/libxml2";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
