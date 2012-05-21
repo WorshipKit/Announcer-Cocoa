@@ -26,6 +26,9 @@
 	IBOutlet NSTextField * flickrStatusLabel;
 	
 	IBOutlet NSButton * flickrToggleSwitch;
+	
+	
+	NSWindow * announcementsWindow;
 }
 
 - (IBAction)toggleFlickr:(id)sender;

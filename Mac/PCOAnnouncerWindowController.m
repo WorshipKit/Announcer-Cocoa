@@ -134,6 +134,7 @@
 
 - (IBAction)startSlideshow:(id)sender;
 {
+	NSLog(@"found %lu announcements to show.", [[announcerController currentAnnouncements] count]);
 	
 }
 

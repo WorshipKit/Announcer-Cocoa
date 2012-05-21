@@ -44,6 +44,79 @@
 }
 
 
+
+- (NSArray *)currentAnnouncements;
+{
+	NSMutableArray * current = [NSMutableArray array];
+	
+	for (NSDictionary * ann in self.announcements)
+	{
+		NSDate * startDate = nil;//[ann objectForKey:@"start_date"];
+		if (![[ann objectForKey:@"start_date"] isKindOfClass:[NSNull class]])
+		{
+			NSDateFormatter *df = [[NSDateFormatter alloc] init];
+			[df setDateFormat:@"yyyyMM/dd hh:mm:ss Z"];
+			startDate = [df dateFromString: [ann objectForKey:@"start_date"]];
+		}
+		
+		NSDate * expDate = nil;//[ann objectForKey:@"expiration_date"];
+		if (![[ann objectForKey:@"expiration_date"] isKindOfClass:[NSNull class]])
+		{
+			NSDateFormatter *df = [[NSDateFormatter alloc] init];
+			[df setDateFormat:@"yyyy/MM/dd hh:mm:ss Z"];
+			expDate = [df dateFromString: [ann objectForKey:@"expiration_date"]];
+		}
+		
+		if (startDate)
+		{
+			NSLog(@"start: %@", startDate);
+		}
+		
+		if (expDate)
+		{
+			NSLog(@"exp: %@", expDate);
+			NSLog(@"exp diff: %f", [expDate timeIntervalSince1970]);
+		}
+		
+		if (!startDate)
+		{
+			if (expDate)
+			{
+				if ([expDate timeIntervalSince1970] > [[NSDate date] timeIntervalSince1970])
+				{
+					[current addObject:ann];
+				}
+			}
+			else
+			{
+				[current addObject:ann];
+			}
+		}
+		else if (!expDate)
+		{
+			if (startDate)
+			{
+				if ([startDate timeIntervalSince1970] < [[NSDate date] timeIntervalSince1970])
+				{
+					[current addObject:ann];
+				}
+			}
+			else
+			{
+				[current addObject:ann];
+			}
+		}
+		else
+		{
+			[current addObject:ann];
+		}
+	}
+	
+	return current;
+}
+
+
+
 - (void)downloadImageFromUrl:(NSString *)imageUrl withCompletionBlock:(void (^)(void))completionBlock andErrorBlock:(void (^)(NSError * error))errorBlock;
 {
 	dispatch_queue_t reqQueue = dispatch_queue_create("com.pco.announcer.imagedownloads", NULL);

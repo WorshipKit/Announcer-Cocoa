@@ -6,7 +6,12 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
+
 #import <UIKit/UIKit.h>
+
+#if !TARGET_OS_IPHONE
+#import <Cocoa/Cocoa.h>
+#endif
 
 #import "PCOAnnouncerMainTableViewController.h"
 
@@ -18,6 +23,8 @@
 	NSArray * announcements;
 	
 	NSArray * flickrImageUrls;
+	
+	
 }
 
 + (NSString *)localCacheDirectoryPath;
@@ -33,6 +40,9 @@
 
 @property (nonatomic, strong) NSString * logoUrl;
 @property (nonatomic, strong) NSArray * announcements;
+
+- (NSArray *)currentAnnouncements;
+
 
 @property (nonatomic, strong) NSArray * flickrImageUrls;
 
