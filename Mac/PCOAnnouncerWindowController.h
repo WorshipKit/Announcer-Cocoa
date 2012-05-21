@@ -7,6 +7,10 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
+
+#import <Quartz/Quartz.h>
+#import <QuartzCore/QuartzCore.h>
 
 #import "PCOAnnouncerController.h"
 
@@ -29,6 +33,14 @@
 	
 	
 	NSWindow * announcementsWindow;
+	
+	CALayer * backgroundLayer;
+	
+	CATextLayer * titleLayer;
+	CATextLayer * bodyLayer;
+	
+	CATextLayer * clockLayer;
+	
 }
 
 - (IBAction)toggleFlickr:(id)sender;

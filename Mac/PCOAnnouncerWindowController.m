@@ -143,6 +143,36 @@
 	[announcementsWindow orderFront:self];
 	
 	[NSCursor setHiddenUntilMouseMoves:YES];
+	
+	[[announcementsWindow contentView] setWantsLayer:YES];
+	backgroundLayer = [[announcementsWindow contentView] layer];
+	
+	
+	NSString * titleText = @"This is a title";
+	NSFont * titleFont = [NSFont fontWithName:@"Myriad Pro Bold" size:56];
+	
+	NSSize titleSize = [titleText sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
+	
+	titleLayer = [CATextLayer layer];
+	titleLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.size.height - titleSize.height, backgroundLayer.bounds.size.width, titleSize.height);
+	titleLayer.string = titleText;
+	titleLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
+	titleLayer.font = (__bridge CFTypeRef)titleFont;
+	titleLayer.fontSize = 56;
+	titleLayer.alignmentMode = kCAAlignmentCenter;
+	[backgroundLayer addSublayer:titleLayer];
+	
+	
+	bodyLayer = [CATextLayer layer];
+	bodyLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.origin.y, backgroundLayer.bounds.size.width, backgroundLayer.bounds.size.height - titleSize.height);
+	bodyLayer.string = @"Here's the longer body copy or something....";
+	bodyLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1);
+	bodyLayer.font = (__bridge CFTypeRef)[NSFont fontWithName:@"Myriad Pro" size:36];
+	bodyLayer.fontSize = 36;
+	bodyLayer.alignmentMode = kCAAlignmentCenter;
+	[backgroundLayer addSublayer:bodyLayer];
+	
+	
 }
 
 
