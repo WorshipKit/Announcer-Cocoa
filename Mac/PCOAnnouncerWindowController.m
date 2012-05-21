@@ -136,6 +136,13 @@
 {
 	NSLog(@"found %lu announcements to show.", [[announcerController currentAnnouncements] count]);
 	
+	announcementsWindow = [[NSWindow alloc] initWithContentRect:[[NSScreen mainScreen] frame] styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:[NSScreen mainScreen]];
+	[announcementsWindow setLevel:NSScreenSaverWindowLevel];
+	[announcementsWindow setBackgroundColor:[NSColor blackColor]];
+	
+	[announcementsWindow orderFront:self];
+	
+	[NSCursor setHiddenUntilMouseMoves:YES];
 }
 
 
