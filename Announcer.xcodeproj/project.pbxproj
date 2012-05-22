@@ -45,6 +45,8 @@
 		960A5CA615536A2F00DB4EB9 /* PCOAnnouncerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5CA415536A2E00DB4EB9 /* PCOAnnouncerController.m */; };
 		960A5CC315536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5CC215536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m */; };
 		960A5CC415536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5CC215536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m */; };
+		96621B58156BD62400B9C7CC /* PCOControlResponseWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 96621B57156BD62400B9C7CC /* PCOControlResponseWindow.m */; };
+		96621B5A156BFDAE00B9C7CC /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96621B59156BFDAE00B9C7CC /* QTKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,6 +129,9 @@
 		960A5CA415536A2E00DB4EB9 /* PCOAnnouncerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PCOAnnouncerController.m; path = Shared/PCOAnnouncerController.m; sourceTree = "<group>"; };
 		960A5CC115536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PCOAnnouncerMainTableViewController.h; path = Shared/PCOAnnouncerMainTableViewController.h; sourceTree = "<group>"; };
 		960A5CC215536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PCOAnnouncerMainTableViewController.m; path = Shared/PCOAnnouncerMainTableViewController.m; sourceTree = "<group>"; };
+		96621B56156BD62400B9C7CC /* PCOControlResponseWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PCOControlResponseWindow.h; path = Mac/PCOControlResponseWindow.h; sourceTree = SOURCE_ROOT; };
+		96621B57156BD62400B9C7CC /* PCOControlResponseWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PCOControlResponseWindow.m; path = Mac/PCOControlResponseWindow.m; sourceTree = SOURCE_ROOT; };
+		96621B59156BFDAE00B9C7CC /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/QTKit.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +159,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96621B5A156BFDAE00B9C7CC /* QTKit.framework in Frameworks */,
 				58B999A8156A7E3B009BA4C8 /* QuartzCore.framework in Frameworks */,
 				58D87AE5155EEA0A004027CD /* libxml2.dylib in Frameworks */,
 				960A5C6A155363E500DB4EB9 /* UIKit.framework in Frameworks */,
@@ -194,7 +200,6 @@
 		960A5B9615535BE300DB4EB9 = {
 			isa = PBXGroup;
 			children = (
-				58D87AE4155EEA0A004027CD /* libxml2.dylib */,
 				960A5C2515535ECC00DB4EB9 /* Shared */,
 				960A5BAB15535BE300DB4EB9 /* iOS */,
 				960A5BFA15535E5800DB4EB9 /* Mac */,
@@ -218,6 +223,8 @@
 		960A5BA415535BE300DB4EB9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				96621B59156BFDAE00B9C7CC /* QTKit.framework */,
+				58D87AE4155EEA0A004027CD /* libxml2.dylib */,
 				58B999A7156A7E3B009BA4C8 /* QuartzCore.framework */,
 				960A5BA515535BE300DB4EB9 /* UIKit.framework */,
 				960A5BA715535BE300DB4EB9 /* Foundation.framework */,
@@ -289,6 +296,8 @@
 				58D87AAB155ECEB2004027CD /* PCOAnnouncerWindowController.h */,
 				58D87AAC155ECEB2004027CD /* PCOAnnouncerWindowController.m */,
 				58D87AAD155ECEB2004027CD /* PCOAnnouncerWindowController.xib */,
+				96621B56156BD62400B9C7CC /* PCOControlResponseWindow.h */,
+				96621B57156BD62400B9C7CC /* PCOControlResponseWindow.m */,
 				960A5BFB15535E5800DB4EB9 /* Supporting Files */,
 			);
 			name = Mac;
@@ -584,6 +593,7 @@
 				58D87AAE155ECEB2004027CD /* PCOAnnouncerWindowController.m in Sources */,
 				58D87AB4155EDA28004027CD /* JSONKit.m in Sources */,
 				58D87ACD155EE92E004027CD /* RKXMLParserLibXML.m in Sources */,
+				96621B58156BD62400B9C7CC /* PCOControlResponseWindow.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

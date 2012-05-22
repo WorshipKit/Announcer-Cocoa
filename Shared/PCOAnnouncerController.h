@@ -37,6 +37,8 @@
 
 - (void)loadFlickrFeedFromLocation:(NSString *)feedUrl withCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))errorBlock;
 
+- (NSString *)pathForImageFileAtUrl:(NSString *)imageUrl;
+
 
 @property (nonatomic, strong) NSString * logoUrl;
 @property (nonatomic, strong) NSArray * announcements;

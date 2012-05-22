@@ -69,13 +69,13 @@
 		
 		if (startDate)
 		{
-			NSLog(@"start: %@", startDate);
+			//NSLog(@"start: %@", startDate);
 		}
 		
 		if (expDate)
 		{
-			NSLog(@"exp: %@", expDate);
-			NSLog(@"exp diff: %f", [expDate timeIntervalSince1970]);
+			//NSLog(@"exp: %@", expDate);
+			//NSLog(@"exp diff: %f", [expDate timeIntervalSince1970]);
 		}
 		
 		if (!startDate)
@@ -255,6 +255,22 @@
 		if ([resultsDictionary objectForKey:@"announcements"])
 		{
 			announcements = [[resultsDictionary objectForKey:@"announcements"] copy];
+			
+			for (NSDictionary * ann in announcements)
+			{
+				if ([ann objectForKey:@"image_url"] && ![[ann objectForKey:@"image_url"] isEqual:[NSNull null]])
+				{
+					[self downloadImageFromUrl:[ann objectForKey:@"image_url"] withCompletionBlock:^{
+						
+						NSLog(@"downloaded image");
+						
+					} andErrorBlock:^(NSError * error) {
+						
+						NSLog(@"error downloading image: %@", [err localizedDescription]);
+						
+					}];
+				}
+			}
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				

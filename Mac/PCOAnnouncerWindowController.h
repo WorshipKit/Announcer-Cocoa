@@ -11,10 +11,13 @@
 
 #import <Quartz/Quartz.h>
 #import <QuartzCore/QuartzCore.h>
+#import <QTKit/QTKit.h>
 
 #import "PCOAnnouncerController.h"
 
-@interface PCOAnnouncerWindowController : NSWindowController
+#import "PCOControlResponseWindow.h"
+
+@interface PCOAnnouncerWindowController : NSWindowController <PCOControlResponseWindowDelegate, NSWindowDelegate>
 {
 	PCOAnnouncerController * announcerController;
 	
@@ -32,15 +35,26 @@
 	IBOutlet NSButton * flickrToggleSwitch;
 	
 	
-	NSWindow * announcementsWindow;
 	
-	CALayer * backgroundLayer;
+	NSInteger currentSlideIndex;
+	
+	PCOControlResponseWindow * announcementsWindow;
+	
+	QTMovieLayer * backgroundLayer;
 	
 	CATextLayer * titleLayer;
 	CATextLayer * bodyLayer;
 	
 	CATextLayer * clockLayer;
 	
+	NSTimer * clockTimer;
+	NSTimer * slideTimer;
+	
+	
+	NSInteger currentFlickrIndex;
+	NSTimer * flickrTimer;
+	PCOControlResponseWindow * flickrWindow;
+	QTMovieLayer * flickrLayer;
 }
 
 - (IBAction)toggleFlickr:(id)sender;
