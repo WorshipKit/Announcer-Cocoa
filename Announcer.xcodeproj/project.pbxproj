@@ -40,11 +40,9 @@
 		960A5C651553615100DB4EB9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C5D1553615100DB4EB9 /* InfoPlist.strings */; };
 		960A5C661553615100DB4EB9 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C5F1553615100DB4EB9 /* Credits.rtf */; };
 		960A5C671553615100DB4EB9 /* Announcer Mac-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C621553615100DB4EB9 /* Announcer Mac-Info.plist */; };
-		960A5C6A155363E500DB4EB9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960A5C4B155360E900DB4EB9 /* UIKit.framework */; };
 		960A5CA515536A2F00DB4EB9 /* PCOAnnouncerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5CA415536A2E00DB4EB9 /* PCOAnnouncerController.m */; };
 		960A5CA615536A2F00DB4EB9 /* PCOAnnouncerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5CA415536A2E00DB4EB9 /* PCOAnnouncerController.m */; };
 		960A5CC315536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5CC215536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m */; };
-		960A5CC415536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5CC215536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m */; };
 		96621B58156BD62400B9C7CC /* PCOControlResponseWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 96621B57156BD62400B9C7CC /* PCOControlResponseWindow.m */; };
 		96621B5A156BFDAE00B9C7CC /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96621B59156BFDAE00B9C7CC /* QTKit.framework */; };
 /* End PBXBuildFile section */
@@ -69,13 +67,6 @@
 			containerPortal = 960A5C43155360E800DB4EB9 /* UIKit.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
-			remoteInfo = UIKit;
-		};
-		960A5C68155363DD00DB4EB9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 960A5C43155360E800DB4EB9 /* UIKit.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = UIKit;
 		};
 /* End PBXContainerItemProxy section */
@@ -162,7 +153,6 @@
 				96621B5A156BFDAE00B9C7CC /* QTKit.framework in Frameworks */,
 				58B999A8156A7E3B009BA4C8 /* QuartzCore.framework in Frameworks */,
 				58D87AE5155EEA0A004027CD /* libxml2.dylib in Frameworks */,
-				960A5C6A155363E500DB4EB9 /* UIKit.framework in Frameworks */,
 				960A5BF515535E5800DB4EB9 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -418,7 +408,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				960A5C69155363DD00DB4EB9 /* PBXTargetDependency */,
 			);
 			name = "Announcer Mac";
 			productName = "Announcer Mac";
@@ -589,7 +578,6 @@
 				960A5C591553613E00DB4EB9 /* PCOAppDelegate.m in Sources */,
 				960A5C631553615100DB4EB9 /* main.m in Sources */,
 				960A5CA615536A2F00DB4EB9 /* PCOAnnouncerController.m in Sources */,
-				960A5CC415536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m in Sources */,
 				58D87AAE155ECEB2004027CD /* PCOAnnouncerWindowController.m in Sources */,
 				58D87AB4155EDA28004027CD /* JSONKit.m in Sources */,
 				58D87ACD155EE92E004027CD /* RKXMLParserLibXML.m in Sources */,
@@ -617,11 +605,6 @@
 			isa = PBXTargetDependency;
 			target = 960A5BF115535E5800DB4EB9 /* Announcer Mac */;
 			targetProxy = 960A5C1415535E5800DB4EB9 /* PBXContainerItemProxy */;
-		};
-		960A5C69155363DD00DB4EB9 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = UIKit;
-			targetProxy = 960A5C68155363DD00DB4EB9 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -788,6 +771,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
@@ -809,6 +793,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

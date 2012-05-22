@@ -368,53 +368,171 @@
 		if (![[NSFileManager defaultManager] fileExistsAtPath:backgroundPath])
 		{
 			NSLog(@"media resource missing from path: %@", backgroundPath);
+			
+			[announcerController downloadImageFromUrl:backgroundUrl withCompletionBlock:^{
+				
+				QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:nil];
+				backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+				backgroundLayer.contentsGravity = kCAGravityResizeAspect;
+				
+				if (loadErr)
+				{
+					NSLog(@"err: %@", [loadErr localizedDescription]);
+				}
+				
+				backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
+				
+				[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
+				
+				
+				float titleFontSize = [self actualFontSizeForText:titleText withFont:[NSFont fontWithName:@"Myriad Pro Bold" size:55] withOriginalSize:55];
+				NSFont * titleFont = [NSFont fontWithName:@"Myriad Pro Bold" size:titleFontSize];
+				
+				NSSize titleBoxSize = [titleText sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
+				
+				titleLayer = [CATextLayer layer];
+				titleLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.size.height - titleBoxSize.height - 10, backgroundLayer.bounds.size.width, titleBoxSize.height);
+				titleLayer.string = titleText;
+				titleLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
+				titleLayer.font = (__bridge CFTypeRef)titleFont;
+				titleLayer.fontSize = titleFontSize;
+				titleLayer.alignmentMode = kCAAlignmentCenter;
+				[backgroundLayer addSublayer:titleLayer];
+				
+				
+				float bodyFontSize = [self actualFontSizeForText:bodyText withFont:[NSFont fontWithName:@"Myriad Pro" size:45] withOriginalSize:45];
+				NSFont * bodyFont = [NSFont fontWithName:@"Myriad Pro" size:bodyFontSize];
+				
+				bodyLayer = [CATextLayer layer];
+				bodyLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.origin.y, backgroundLayer.bounds.size.width, backgroundLayer.bounds.size.height - titleBoxSize.height - 45);
+				bodyLayer.string = bodyText;
+				bodyLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1);
+				bodyLayer.font = (__bridge CFTypeRef)bodyFont;
+				bodyLayer.fontSize = bodyFontSize;
+				bodyLayer.alignmentMode = kCAAlignmentCenter;
+				[backgroundLayer addSublayer:bodyLayer];
+				
+			} andErrorBlock:^(NSError * err) {
+				
+				backgroundLayer = [QTMovieLayer layer];
+				
+				backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
+				
+				[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
+				
+				
+				float titleFontSize = [self actualFontSizeForText:titleText withFont:[NSFont fontWithName:@"Myriad Pro Bold" size:55] withOriginalSize:55];
+				NSFont * titleFont = [NSFont fontWithName:@"Myriad Pro Bold" size:titleFontSize];
+				
+				NSSize titleBoxSize = [titleText sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
+				
+				titleLayer = [CATextLayer layer];
+				titleLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.size.height - titleBoxSize.height - 10, backgroundLayer.bounds.size.width, titleBoxSize.height);
+				titleLayer.string = titleText;
+				titleLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
+				titleLayer.font = (__bridge CFTypeRef)titleFont;
+				titleLayer.fontSize = titleFontSize;
+				titleLayer.alignmentMode = kCAAlignmentCenter;
+				[backgroundLayer addSublayer:titleLayer];
+				
+				
+				float bodyFontSize = [self actualFontSizeForText:bodyText withFont:[NSFont fontWithName:@"Myriad Pro" size:45] withOriginalSize:45];
+				NSFont * bodyFont = [NSFont fontWithName:@"Myriad Pro" size:bodyFontSize];
+				
+				bodyLayer = [CATextLayer layer];
+				bodyLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.origin.y, backgroundLayer.bounds.size.width, backgroundLayer.bounds.size.height - titleBoxSize.height - 45);
+				bodyLayer.string = bodyText;
+				bodyLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1);
+				bodyLayer.font = (__bridge CFTypeRef)bodyFont;
+				bodyLayer.fontSize = bodyFontSize;
+				bodyLayer.alignmentMode = kCAAlignmentCenter;
+				[backgroundLayer addSublayer:bodyLayer];
+				
+			}];
 		}
-		
-		QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:&loadErr];
-		backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
-		backgroundLayer.contentsGravity = kCAGravityResizeAspect;
-		
-		if (loadErr)
+		else // if image exists
 		{
-			NSLog(@"err: %@", [loadErr localizedDescription]);
+			QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:&loadErr];
+			backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+			backgroundLayer.contentsGravity = kCAGravityResizeAspect;
+			
+			if (loadErr)
+			{
+				NSLog(@"err: %@", [loadErr localizedDescription]);
+			}
+			
+			backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
+			
+			[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
+			
+			
+			float titleFontSize = [self actualFontSizeForText:titleText withFont:[NSFont fontWithName:@"Myriad Pro Bold" size:55] withOriginalSize:55];
+			NSFont * titleFont = [NSFont fontWithName:@"Myriad Pro Bold" size:titleFontSize];
+			
+			NSSize titleBoxSize = [titleText sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
+			
+			titleLayer = [CATextLayer layer];
+			titleLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.size.height - titleBoxSize.height - 10, backgroundLayer.bounds.size.width, titleBoxSize.height);
+			titleLayer.string = titleText;
+			titleLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
+			titleLayer.font = (__bridge CFTypeRef)titleFont;
+			titleLayer.fontSize = titleFontSize;
+			titleLayer.alignmentMode = kCAAlignmentCenter;
+			[backgroundLayer addSublayer:titleLayer];
+			
+			
+			float bodyFontSize = [self actualFontSizeForText:bodyText withFont:[NSFont fontWithName:@"Myriad Pro" size:45] withOriginalSize:45];
+			NSFont * bodyFont = [NSFont fontWithName:@"Myriad Pro" size:bodyFontSize];
+			
+			bodyLayer = [CATextLayer layer];
+			bodyLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.origin.y, backgroundLayer.bounds.size.width, backgroundLayer.bounds.size.height - titleBoxSize.height - 45);
+			bodyLayer.string = bodyText;
+			bodyLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1);
+			bodyLayer.font = (__bridge CFTypeRef)bodyFont;
+			bodyLayer.fontSize = bodyFontSize;
+			bodyLayer.alignmentMode = kCAAlignmentCenter;
+			[backgroundLayer addSublayer:bodyLayer];
 		}
+		
 	}
 	else
 	{
 		backgroundLayer = [QTMovieLayer layer];
+		
+		backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
+		
+		[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
+		
+		
+		float titleFontSize = [self actualFontSizeForText:titleText withFont:[NSFont fontWithName:@"Myriad Pro Bold" size:55] withOriginalSize:55];
+		NSFont * titleFont = [NSFont fontWithName:@"Myriad Pro Bold" size:titleFontSize];
+		
+		NSSize titleBoxSize = [titleText sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
+		
+		titleLayer = [CATextLayer layer];
+		titleLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.size.height - titleBoxSize.height - 10, backgroundLayer.bounds.size.width, titleBoxSize.height);
+		titleLayer.string = titleText;
+		titleLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
+		titleLayer.font = (__bridge CFTypeRef)titleFont;
+		titleLayer.fontSize = titleFontSize;
+		titleLayer.alignmentMode = kCAAlignmentCenter;
+		[backgroundLayer addSublayer:titleLayer];
+		
+		
+		float bodyFontSize = [self actualFontSizeForText:bodyText withFont:[NSFont fontWithName:@"Myriad Pro" size:45] withOriginalSize:45];
+		NSFont * bodyFont = [NSFont fontWithName:@"Myriad Pro" size:bodyFontSize];
+		
+		bodyLayer = [CATextLayer layer];
+		bodyLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.origin.y, backgroundLayer.bounds.size.width, backgroundLayer.bounds.size.height - titleBoxSize.height - 45);
+		bodyLayer.string = bodyText;
+		bodyLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1);
+		bodyLayer.font = (__bridge CFTypeRef)bodyFont;
+		bodyLayer.fontSize = bodyFontSize;
+		bodyLayer.alignmentMode = kCAAlignmentCenter;
+		[backgroundLayer addSublayer:bodyLayer];
 	}
 	
-	backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
 	
-	[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
-	
-	
-	float titleFontSize = [self actualFontSizeForText:titleText withFont:[NSFont fontWithName:@"Myriad Pro Bold" size:55] withOriginalSize:55];
-	NSFont * titleFont = [NSFont fontWithName:@"Myriad Pro Bold" size:titleFontSize];
-	
-	NSSize titleBoxSize = [titleText sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
-	
-	titleLayer = [CATextLayer layer];
-	titleLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.size.height - titleBoxSize.height - 10, backgroundLayer.bounds.size.width, titleBoxSize.height);
-	titleLayer.string = titleText;
-	titleLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
-	titleLayer.font = (__bridge CFTypeRef)titleFont;
-	titleLayer.fontSize = titleFontSize;
-	titleLayer.alignmentMode = kCAAlignmentCenter;
-	[backgroundLayer addSublayer:titleLayer];
-	
-	
-	float bodyFontSize = [self actualFontSizeForText:bodyText withFont:[NSFont fontWithName:@"Myriad Pro" size:45] withOriginalSize:45];
-	NSFont * bodyFont = [NSFont fontWithName:@"Myriad Pro" size:bodyFontSize];
-	
-	bodyLayer = [CATextLayer layer];
-	bodyLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.origin.y, backgroundLayer.bounds.size.width, backgroundLayer.bounds.size.height - titleBoxSize.height - 45);
-	bodyLayer.string = bodyText;
-	bodyLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1);
-	bodyLayer.font = (__bridge CFTypeRef)bodyFont;
-	bodyLayer.fontSize = bodyFontSize;
-	bodyLayer.alignmentMode = kCAAlignmentCenter;
-	[backgroundLayer addSublayer:bodyLayer];
 	
 	[NSCursor setHiddenUntilMouseMoves:YES];
 	
@@ -458,11 +576,36 @@
 		if (![[NSFileManager defaultManager] fileExistsAtPath:backgroundPath])
 		{
 			NSLog(@"media resource missing from path: %@", backgroundPath);
+			
+			[announcerController downloadImageFromUrl:backgroundUrl withCompletionBlock:^{
+				
+				QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:nil];
+				flickrLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+				flickrLayer.contentsGravity = kCAGravityResizeAspect;
+				
+				flickrLayer.frame = [[flickrWindow contentView] layer].bounds;
+				
+				[[[flickrWindow contentView] layer] addSublayer:flickrLayer];
+				
+			} andErrorBlock:^(NSError * err) {
+				
+				flickrLayer = [QTMovieLayer layer];
+				flickrLayer.frame = [[flickrWindow contentView] layer].bounds;
+				
+				[[[flickrWindow contentView] layer] addSublayer:flickrLayer];
+				
+			}];
 		}
-		
-		QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:&loadErr];
-		flickrLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
-		flickrLayer.contentsGravity = kCAGravityResizeAspect;
+		else
+		{
+			QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:nil];
+			flickrLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+			flickrLayer.contentsGravity = kCAGravityResizeAspect;
+			
+			flickrLayer.frame = [[flickrWindow contentView] layer].bounds;
+			
+			[[[flickrWindow contentView] layer] addSublayer:flickrLayer];
+		}
 		
 		if (loadErr)
 		{
@@ -472,11 +615,11 @@
 	else
 	{
 		flickrLayer = [QTMovieLayer layer];
+		
+		flickrLayer.frame = [[flickrWindow contentView] layer].bounds;
+		
+		[[[flickrWindow contentView] layer] addSublayer:flickrLayer];
 	}
-	
-	flickrLayer.frame = [[flickrWindow contentView] layer].bounds;
-	
-	[[[flickrWindow contentView] layer] addSublayer:flickrLayer];
 	
 	currentFlickrIndex = picIndex;
 }

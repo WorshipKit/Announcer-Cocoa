@@ -21,10 +21,7 @@
 	self = [super init];
 	if (self)
 	{
-		PCOAnnouncerMainTableViewController * mainTableController = [[PCOAnnouncerMainTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-		
-		mainNavigationController = [[UINavigationController alloc] initWithRootViewController:mainTableController];
-		
+		//PCOAnnouncerMainTableViewController * mainTableController = [[PCOAnnouncerMainTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
 		
 	}
 	
@@ -35,12 +32,9 @@
 {
 	NSString* path = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0];
 	
+	path = [path stringByAppendingPathComponent:@"Announcer"];
+	
 	return path;
-}
-
-- (UIViewController *)viewController;
-{
-	return mainNavigationController;
 }
 
 
@@ -153,6 +147,12 @@
 			});
 			
 			return;
+		}
+		
+		if (![[NSFileManager defaultManager] fileExistsAtPath:[PCOAnnouncerController localCacheDirectoryPath]])
+		{
+			[[NSFileManager defaultManager] createDirectoryAtPath:[PCOAnnouncerController localCacheDirectoryPath] withIntermediateDirectories:YES attributes:nil error:nil];
+			
 		}
 		
 		NSLog(@"saving to %@", [self pathForImageFileAtUrl:imageUrl]);

@@ -7,18 +7,19 @@
 //
 
 
-#import <UIKit/UIKit.h>
+
 
 #if !TARGET_OS_IPHONE
 #import <Cocoa/Cocoa.h>
+#else
+#import <UIKit/UIKit.h>
+#import "PCOAnnouncerMainTableViewController.h"
 #endif
 
-#import "PCOAnnouncerMainTableViewController.h"
+
 
 @interface PCOAnnouncerController : NSObject
 {
-	UINavigationController * mainNavigationController;
-	
 	NSString * logoUrl;
 	NSArray * announcements;
 	
@@ -30,12 +31,12 @@
 + (NSString *)localCacheDirectoryPath;
 
 
-- (UIViewController *)viewController;
-
 
 - (void)loadAnnouncementsFromFeedLocation:(NSString *)feedUrl withCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))error;
 
 - (void)loadFlickrFeedFromLocation:(NSString *)feedUrl withCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))errorBlock;
+
+- (void)downloadImageFromUrl:(NSString *)imageUrl withCompletionBlock:(void (^)(void))completionBlock andErrorBlock:(void (^)(NSError * error))errorBlock;
 
 - (NSString *)pathForImageFileAtUrl:(NSString *)imageUrl;
 
