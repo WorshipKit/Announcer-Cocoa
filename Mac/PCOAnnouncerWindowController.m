@@ -22,7 +22,7 @@
 		announcerController = [[PCOAnnouncerController alloc] init];
 		
 		NSMutableDictionary *appDefaults = [NSMutableDictionary dictionary];
-		[appDefaults setObject:@"http://announcer.heroku.com/sample_feed.json" forKey:@"feedUrl"];
+		[appDefaults setObject:@"1" forKey:@"churchId"];
 		[appDefaults setObject:@"http://api.flickr.com/services/feeds/photos_public.gne?id=20901156@N02&lang=en-us&format=rss_200" forKey:@"flickr_feed_url"];
 		[appDefaults setObject:[NSNumber numberWithFloat:10.0] forKey:@"seconds_per_picture"];
 		[appDefaults setObject:[NSNumber numberWithBool:NO] forKey:@"show_clock"];
@@ -73,7 +73,7 @@
 
 - (IBAction)announcementsUrlChanged:(id)sender;
 {
-	NSString * feedUrl = announcementsFeedField.stringValue;
+	NSString * feedUrl = [NSString stringWithFormat:@"http://announcer.heroku.com/feeds/%@.json", announcementsFeedField.stringValue];
 	NSLog(@"feed: %@", feedUrl);
 	
 	if (feedUrl == nil || [feedUrl length] == 0)
@@ -88,7 +88,7 @@
 		
 		[announcementsActivitySpinner stopAnimation:sender];
 		
-		announcementsStatusLabel.stringValue = [NSString stringWithFormat:@"Feed is ready. Found %d announcements", [announcerController.announcements count]];
+		announcementsStatusLabel.stringValue = [NSString stringWithFormat:@"Feed is ready. Found %ld announcements", [announcerController.announcements count]];
 		
 	} andErrorBlock:^(NSError * error) {
 		NSLog(@"error: %@", [error localizedDescription]);
@@ -118,7 +118,7 @@
 		
 		[flickrActivitySpinner stopAnimation:sender];
 		
-		flickrStatusLabel.stringValue = [NSString stringWithFormat:@"Feed is ready. Found %d images", [announcerController.flickrImageUrls count]];
+		flickrStatusLabel.stringValue = [NSString stringWithFormat:@"Feed is ready. Found %ld images", [announcerController.flickrImageUrls count]];
 		
 	} andErrorBlock:^(NSError * error) {
 		NSLog(@"error: %@", [error localizedDescription]);
@@ -354,7 +354,7 @@
 	[backgroundLayer removeFromSuperlayer];
 	
 	
-	NSString * backgroundUrl = [[[announcerController currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"image_url"];
+	NSString * backgroundUrl = [[[announcerController currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"background_file_url"];
 	NSString * backgroundPath = nil;
 	if ([backgroundUrl isKindOfClass:[NSString class]])
 	{

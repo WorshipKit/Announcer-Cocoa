@@ -54,11 +54,11 @@
 		}
 		
 		NSDate * expDate = nil;//[ann objectForKey:@"expiration_date"];
-		if (![[ann objectForKey:@"expiration_date"] isKindOfClass:[NSNull class]])
+		if (![[ann objectForKey:@"expiration"] isKindOfClass:[NSNull class]])
 		{
 			NSDateFormatter *df = [[NSDateFormatter alloc] init];
 			[df setDateFormat:@"yyyy/MM/dd hh:mm:ss Z"];
-			expDate = [df dateFromString: [ann objectForKey:@"expiration_date"]];
+			expDate = [df dateFromString: [ann objectForKey:@"expiration"]];
 		}
 		
 		if (startDate)
@@ -258,9 +258,9 @@
 			
 			for (NSDictionary * ann in announcements)
 			{
-				if ([ann objectForKey:@"image_url"] && ![[ann objectForKey:@"image_url"] isEqual:[NSNull null]])
+				if ([ann objectForKey:@"background_file_url"] && ![[ann objectForKey:@"background_file_url"] isEqual:[NSNull null]])
 				{
-					[self downloadImageFromUrl:[ann objectForKey:@"image_url"] withCompletionBlock:^{
+					[self downloadImageFromUrl:[ann objectForKey:@"background_file_url"] withCompletionBlock:^{
 						
 						NSLog(@"downloaded image");
 						
