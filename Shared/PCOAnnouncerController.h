@@ -22,9 +22,9 @@
 {
 	NSString * logoUrl;
 	NSArray * announcements;
-	
+
+	NSArray * serviceTimes;
 	NSArray * flickrImageUrls;
-	
 	
 }
 
@@ -42,11 +42,12 @@
 
 
 @property (nonatomic, strong) NSString * logoUrl;
+
 @property (nonatomic, strong) NSArray * announcements;
 
 - (NSArray *)currentAnnouncements;
 
-
+@property (nonatomic, strong) NSArray * serviceTimes;
 @property (nonatomic, strong) NSArray * flickrImageUrls;
 
 @end

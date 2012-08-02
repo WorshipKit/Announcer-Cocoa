@@ -14,7 +14,7 @@
 
 @implementation PCOAnnouncerController
 
-@synthesize logoUrl, announcements, flickrImageUrls;
+@synthesize logoUrl, announcements, flickrImageUrls, serviceTimes;
 
 - (id)init;
 {
@@ -250,18 +250,25 @@
 
 			if ([org objectForKey:@"logo_file_url"])
 			{
-				logoUrl = [[org objectForKey:@"logo_file_url"] copy];
-				NSLog(@"loading logo from %@", logoUrl);
+				NSString * newLogo = [org objectForKey:@"logo_file_url"];
 
-				[self downloadImageFromUrl:logoUrl withCompletionBlock:^{
+				dispatch_async(dispatch_get_main_queue(), ^{
 
-					NSLog(@"downloaded logo image");
+					self.logoUrl = newLogo;
 
-				} andErrorBlock:^(NSError * error) {
+					NSLog(@"loading logo from %@", logoUrl);
 
-					NSLog(@"error loading image: %@", [error localizedDescription]);
+					[self downloadImageFromUrl:logoUrl withCompletionBlock:^{
 
-				}];
+						NSLog(@"downloaded logo image");
+
+					} andErrorBlock:^(NSError * error) {
+
+						NSLog(@"error loading image: %@", [error localizedDescription]);
+						
+					}];
+
+				});
 			}
 
 			if ([org objectForKey:@"flickr_feed"])
@@ -302,12 +309,23 @@
 				[[NSUserDefaults standardUserDefaults] setObject:showFlickr forKey:@"show_flickr"];
 			}
 		}
-		
+
+		if ([resultsDictionary objectForKey:@"service_times"])
+		{
+			NSArray * times = [resultsDictionary objectForKey:@"service_times"];
+
+			dispatch_async(dispatch_get_main_queue(), ^{
+
+				self.serviceTimes = times;
+
+			});
+		}
+
 		if ([resultsDictionary objectForKey:@"announcements"])
 		{
-			announcements = [[resultsDictionary objectForKey:@"announcements"] copy];
+			NSArray * newAnnouncements = [resultsDictionary objectForKey:@"announcements"];
 			
-			for (NSDictionary * ann in announcements)
+			for (NSDictionary * ann in newAnnouncements)
 			{
 				if ([ann objectForKey:@"background_file_url"] && ![[ann objectForKey:@"background_file_url"] isEqual:[NSNull null]])
 				{
@@ -324,7 +342,9 @@
 			}
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
-				
+
+				self.announcements = newAnnouncements;
+
 				completion();
 				
 				dispatch_release(reqQueue); //this executes on main thread
@@ -477,6 +497,20 @@
 		
 	});
 	
+}
+
+
+
+- (NSInteger)dayOfWeek;
+{
+	NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+
+	NSDateComponents * weekdayComponents = [gregorian components:NSWeekdayCalendarUnit fromDate:[NSDate date]];
+
+	NSInteger weekday = [weekdayComponents weekday];
+	// weekday 1 = Sunday for Gregorian calendar
+
+	return weekday;
 }
 
 
