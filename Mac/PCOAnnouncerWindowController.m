@@ -214,8 +214,8 @@
 	
 	NSLog(@"found %lu announcements to show.", [[announcerController currentAnnouncements] count]);
 	
-	//NSRect frameRect = NSMakeRect(100, 100, 340, 280);
-	NSRect frameRect = [[NSScreen mainScreen] frame];
+	NSRect frameRect = NSMakeRect(100, 100, 340, 280);
+	//NSRect frameRect = [[NSScreen mainScreen] frame];
 	
 	announcementsWindow = [[PCOControlResponseWindow alloc] initWithContentRect:frameRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:[NSScreen mainScreen]];
 	announcementsWindow.keyPressDelegate = self;
@@ -307,8 +307,119 @@
 	clockLayer.string = [df stringFromDate:[NSDate date]];
 }
 
+- (void)showBigLogo;
+{
+
+	NSInteger slideIndex = -1;
+	
+
+	[slideTimer invalidate], slideTimer = nil;
+
+	NSLog(@"playing slide %ld", slideIndex);
+
+
+
+
+	[titleLayer removeFromSuperlayer];
+	titleLayer = nil;
+
+	[bodyLayer removeFromSuperlayer];
+	bodyLayer = nil;
+
+	[backgroundLayer removeFromSuperlayer];
+
+
+	NSString * backgroundUrl = announcerController.logoUrl;
+	NSString * backgroundPath = nil;
+	if ([backgroundUrl isKindOfClass:[NSString class]])
+	{
+		backgroundPath = [announcerController pathForImageFileAtUrl:backgroundUrl];
+	}
+
+	if (backgroundPath)
+	{
+		NSError * loadErr = nil;
+
+		if (![[NSFileManager defaultManager] fileExistsAtPath:backgroundPath])
+		{
+			NSLog(@"media resource missing from path: %@", backgroundPath);
+
+			[announcerController downloadImageFromUrl:backgroundUrl withCompletionBlock:^{
+
+				QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:nil];
+				backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+				backgroundLayer.contentsGravity = kCAGravityResizeAspect;
+
+				if (loadErr)
+				{
+					NSLog(@"err: %@", [loadErr localizedDescription]);
+				}
+
+				backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
+
+				[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
+
+				
+
+			} andErrorBlock:^(NSError * err) {
+
+				backgroundLayer = [QTMovieLayer layer];
+
+				backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
+
+				[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
+
+
+
+			}];
+		}
+		else // if image exists
+		{
+			QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:&loadErr];
+			backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+			backgroundLayer.contentsGravity = kCAGravityResizeAspect;
+
+			if (loadErr)
+			{
+				NSLog(@"err: %@", [loadErr localizedDescription]);
+			}
+
+			backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
+
+			[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
+
+
+		}
+
+	}
+	else
+	{
+		backgroundLayer = [QTMovieLayer layer];
+
+		backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
+
+		[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
+
+
+	}
+
+
+
+	[NSCursor setHiddenUntilMouseMoves:YES];
+
+}
+
 - (void)nextSlide;
 {
+	if ([[announcerController currentAnnouncements] count] == 0)
+	{
+		// just show logo
+		[self showBigLogo];
+
+		return;
+	}
+
+	
 	NSInteger slideIndex = currentSlideIndex + 1;
 	
 	if (slideIndex < 0)

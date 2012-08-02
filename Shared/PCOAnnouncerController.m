@@ -235,21 +235,72 @@
 		}
 		
 		NSDictionary *resultsDictionary = [jsonData objectFromJSONData];
-		
-		if ([resultsDictionary objectForKey:@"logo_image_url"])
+
+		if ([resultsDictionary objectForKey:@"organization"])
 		{
-			logoUrl = [[resultsDictionary objectForKey:@"logo_image_url"] copy];
-			NSLog(@"loading logo from %@", logoUrl);
-			
-			[self downloadImageFromUrl:logoUrl withCompletionBlock:^{
-				
-				NSLog(@"downloaded image");
-				
-			} andErrorBlock:^(NSError * error) {
-				
-				NSLog(@"error loading image: %@", [error localizedDescription]);
-				
-			}];
+			NSDictionary * org = [resultsDictionary objectForKey:@"organization"];
+
+			if ([org objectForKey:@"default_seconds_per_slide"])
+			{
+				NSNumber * seconds = [org objectForKey:@"default_seconds_per_slide"];
+				NSLog(@"seconds per picture: %d", [seconds intValue]);
+
+				[[NSUserDefaults standardUserDefaults] setObject:seconds forKey:@"seconds_per_picture"];
+			}
+
+			if ([org objectForKey:@"logo_file_url"])
+			{
+				logoUrl = [[org objectForKey:@"logo_file_url"] copy];
+				NSLog(@"loading logo from %@", logoUrl);
+
+				[self downloadImageFromUrl:logoUrl withCompletionBlock:^{
+
+					NSLog(@"downloaded logo image");
+
+				} andErrorBlock:^(NSError * error) {
+
+					NSLog(@"error loading image: %@", [error localizedDescription]);
+
+				}];
+			}
+
+			if ([org objectForKey:@"flickr_feed"])
+			{
+				NSString * flickrFeedUrl = [org objectForKey:@"flickr_feed"];
+				NSLog(@"flickr feed updated: %@", flickrFeedUrl);
+
+				[[NSUserDefaults standardUserDefaults] setObject:flickrFeedUrl forKey:@"flickr_feed_url"];
+			}
+
+			if ([org objectForKey:@"show_clock"])
+			{
+				NSNumber * showClock = [org objectForKey:@"show_clock"];
+				if ([showClock boolValue])
+				{
+					NSLog(@"clock enabled");
+				}
+				else
+				{
+					NSLog(@"clock disabled");
+				}
+
+				[[NSUserDefaults standardUserDefaults] setObject:showClock forKey:@"show_clock"];
+			}
+
+			if ([org objectForKey:@"show_flickr"])
+			{
+				NSNumber * showFlickr = [org objectForKey:@"show_flickr"];
+				if ([showFlickr boolValue])
+				{
+					NSLog(@"flickr enabled");
+				}
+				else
+				{
+					NSLog(@"flickr disabled");
+				}
+
+				[[NSUserDefaults standardUserDefaults] setObject:showFlickr forKey:@"show_flickr"];
+			}
 		}
 		
 		if ([resultsDictionary objectForKey:@"announcements"])
