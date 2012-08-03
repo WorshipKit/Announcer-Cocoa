@@ -22,11 +22,311 @@
 	if (self)
 	{
 		//PCOAnnouncerMainTableViewController * mainTableController = [[PCOAnnouncerMainTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-		
+
+		currentSlideIndex = -1;
+		currentFlickrIndex = -1;
+
+		clockTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateClock) userInfo:nil repeats:YES];
 	}
 	
 	return self;
 }
+
+
+
+- (NSString *)currentClockString;
+{
+	NSDateFormatter *df = [[NSDateFormatter alloc] init];
+	//[df setDateFormat:@"yyyy/MM/dd hh:mm:ss Z"];
+	[df setDateStyle:NSDateFormatterLongStyle];
+	[df setTimeStyle:NSDateFormatterLongStyle];
+	
+	return [df stringFromDate:[NSDate date]];
+}
+
+
+
+- (BOOL)shouldShowClock;
+{
+	return [[[NSUserDefaults standardUserDefaults] valueForKey:@"show_clock"] boolValue];
+}
+
+- (void)setShouldShowClock:(BOOL)flag;
+{
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:@"show_clock"];
+}
+
+- (BOOL)shouldShowFlickr;
+{
+	return [[[NSUserDefaults standardUserDefaults] valueForKey:@"show_flickr"] boolValue];
+}
+
+- (void)setShouldShowFlickr:(BOOL)flag;
+{
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:@"show_flickr"];
+}
+
+
+
+- (void)updateClock;
+{
+	[self.delegate timeUpdated];
+}
+
+
+
+
+
+
+- (void)showBigLogoWithCompletion:(void (^)(void))completionBlock;
+{
+	NSInteger slideIndex = -1;
+
+	NSLog(@"playing slide %ld", slideIndex);
+
+	if (!self.logoUrl)
+	{
+		completionBlock();
+
+		return;
+	}
+
+	if (![[NSFileManager defaultManager] fileExistsAtPath:self.logoPath])
+	{
+		if (!self.logoPath)
+		{
+			self.logoPath = [self pathForImageFileAtUrl:self.logoUrl];
+		}
+
+		[self downloadImageFromUrl:self.logoUrl withCompletionBlock:^{
+
+			self.currentBackgroundPath = self.logoPath;
+
+			completionBlock();
+
+		} andErrorBlock:^(NSError * error) {
+
+			self.currentBackgroundPath = nil;
+
+			completionBlock();
+
+		}];
+	}
+	else
+	{
+		self.currentBackgroundPath = self.logoPath;
+
+		completionBlock();
+	}
+
+	
+}
+
+
+- (void)showNextSlideWithCompletion:(void (^)(void))completionBlock;
+{
+	[slideTimer invalidate], slideTimer = nil;
+
+	if ([[self currentAnnouncements] count] == 0)
+	{
+		// just show logo
+		[self showBigLogoWithCompletion:^{
+
+			completionBlock();
+			
+		}];
+
+		return;
+	}
+
+	float slideDuration = 10;
+
+
+	NSInteger slideIndex = currentSlideIndex + 1;
+
+	if (slideIndex < 0)
+	{
+		slideIndex = 0;
+	}
+
+	if (slideIndex >= [[self currentAnnouncements] count])
+	{
+		slideIndex = 0;
+	}
+
+
+	NSLog(@"playing slide %ld", slideIndex);
+
+	NSString * titleText = nil;//[[[announcerController currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"title"];
+	if (![[[[self currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"title"] isEqual:[NSNull null]])
+	{
+		titleText = [[[self currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"title"];
+	}
+
+	self.currentTitle = titleText;
+
+	NSString * bodyText = nil;//[[[announcerController currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"body"];
+	if (![[[[self currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"body"] isEqual:[NSNull null]])
+	{
+		bodyText = [[[self currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"body"];
+	}
+
+	self.currentBody = bodyText;
+
+	if ([[[self currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"duration_seconds"])
+	{
+		slideDuration = [[[[self currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"duration_seconds"] floatValue];
+	}
+
+	
+
+	NSString * backgroundUrl = [[[self currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"background_file_url"];
+	NSString * backgroundPath = nil;
+	if ([backgroundUrl isKindOfClass:[NSString class]])
+	{
+		backgroundPath = [self pathForImageFileAtUrl:backgroundUrl];
+	}
+
+	if (![[NSFileManager defaultManager] fileExistsAtPath:backgroundPath])
+	{
+		[self downloadImageFromUrl:backgroundUrl withCompletionBlock:^{
+
+			self.currentBackgroundPath = backgroundPath;
+
+			completionBlock();
+
+		} andErrorBlock:^(NSError * err) {
+
+			self.currentBackgroundPath = nil;
+
+			completionBlock();
+		}];
+	}
+	else
+	{
+		self.currentBackgroundPath = backgroundPath;
+
+		completionBlock();
+	}
+
+	currentSlideIndex = slideIndex;
+	
+	slideTimer = [NSTimer scheduledTimerWithTimeInterval:slideDuration target:self selector:@selector(nextSlide) userInfo:nil repeats:NO];
+
+	
+}
+
+- (void)showPreviousSlideWithCompletion:(void (^)(void))completionBlock;
+{
+	[slideTimer invalidate], slideTimer = nil;
+
+	if ([[self currentAnnouncements] count] == 0)
+	{
+		// just show logo
+		[self showBigLogoWithCompletion:^{
+
+			completionBlock();
+
+		}];
+
+		return;
+	}
+
+	int slideDuration = 10;
+
+	
+
+	slideTimer = [NSTimer scheduledTimerWithTimeInterval:slideDuration target:self selector:@selector(nextSlide) userInfo:nil repeats:NO];
+
+	completionBlock();
+}
+
+
+
+- (void)showNextFlickrImageWithCompletion:(void (^)(void))completionBlock;
+{
+	[flickrTimer invalidate], flickrTimer = nil;
+
+
+	NSInteger picIndex = currentFlickrIndex + 1;
+
+	if (picIndex < 0)
+	{
+		picIndex = 0;
+	}
+
+	if (picIndex >= [[self flickrImageUrls] count])
+	{
+		picIndex = 0;
+	}
+
+
+	NSString * backgroundUrl = [[self flickrImageUrls] objectAtIndex:picIndex];
+	NSString * backgroundPath = nil;
+	if ([backgroundUrl isKindOfClass:[NSString class]])
+	{
+		backgroundPath = [self pathForImageFileAtUrl:backgroundUrl];
+	}
+
+	currentFlickrIndex = picIndex;
+
+
+	float secondsPerPicture = 10;
+	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"seconds_per_picture"] floatValue] > 0)
+	{
+		secondsPerPicture = [[[NSUserDefaults standardUserDefaults] valueForKey:@"seconds_per_picture"] floatValue];
+	}
+
+	flickrTimer = [NSTimer scheduledTimerWithTimeInterval:secondsPerPicture target:self selector:@selector(nextPicture) userInfo:nil repeats:YES];
+}
+
+- (void)showPreviousFlickrImage:(void (^)(void))completionBlock;
+{
+	[flickrTimer invalidate], flickrTimer = nil;
+
+
+
+
+	float secondsPerPicture = 10;
+	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"seconds_per_picture"] floatValue] > 0)
+	{
+		secondsPerPicture = [[[NSUserDefaults standardUserDefaults] valueForKey:@"seconds_per_picture"] floatValue];
+	}
+
+	flickrTimer = [NSTimer scheduledTimerWithTimeInterval:secondsPerPicture target:self selector:@selector(nextPicture) userInfo:nil repeats:YES];
+}
+
+
+
+- (void)nextSlide;
+{
+	[self showNextSlideWithCompletion:^{
+
+		[self.delegate slideUpdated];
+
+	}];
+}
+
+- (void)nextPicture;
+{
+	[self showNextFlickrImageWithCompletion:^{
+
+		[self.delegate pictureUpdated];
+
+	}];
+}
+
+
+- (void)allStop;
+{
+	[clockTimer invalidate], clockTimer = nil;
+	[slideTimer invalidate], slideTimer = nil;
+	[flickrTimer invalidate], flickrTimer = nil;
+
+	currentSlideIndex = -1;
+}
+
+
 
 + (NSString *)localCacheDirectoryPath;
 {

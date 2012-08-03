@@ -20,6 +20,7 @@
 	if (self)
 	{
 		announcerController = [[PCOAnnouncerController alloc] init];
+		announcerController.delegate = self;
 		
 		NSMutableDictionary *appDefaults = [NSMutableDictionary dictionary];
 		[appDefaults setObject:@"1" forKey:@"churchId"];
@@ -46,13 +47,13 @@
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
 	
 	[self announcementsUrlChanged:self];
-	[self flickrUrlChanged:self];
+	//[self flickrUrlChanged:self];
 	
-	[self toggleFlickr:self];
+	//[self toggleFlickr:self];
 }
 
 
-
+/*
 - (IBAction)toggleFlickr:(id)sender;
 {
 	NSLog(@"state: %ld", flickrToggleSwitch.state);
@@ -66,9 +67,8 @@
 		flickrSettingsBox.hidden = YES;
 	}
 	
-	
 }
-
+*/
 
 
 - (IBAction)announcementsUrlChanged:(id)sender;
@@ -101,6 +101,7 @@
 }
 
 
+/*
 - (IBAction)flickrUrlChanged:(id)sender;
 {
 	NSString * feedUrl = flickrFeedField.stringValue;
@@ -129,8 +130,25 @@
 		
 	}];
 }
+*/
 
 
+#pragma mark - Delegate
+
+- (void)timeUpdated;
+{
+	[self updateClock];
+}
+
+- (void)slideUpdated;
+{
+	[self updateSlide];
+}
+
+- (void)pictureUpdated;
+{
+	[self updateFlickrImage];
+}
 
 
 
@@ -202,7 +220,7 @@
 
 
 
-
+#pragma mark - Control methods
 
 - (IBAction)startSlideshow:(id)sender;
 {
@@ -211,37 +229,33 @@
 		NSLog(@"show already running.");
 		return;
 	}
-	
+
 	NSLog(@"found %lu announcements to show.", [[announcerController currentAnnouncements] count]);
-	
+
 	NSRect frameRect = NSMakeRect(100, 100, 340, 280);
 	//NSRect frameRect = [[NSScreen mainScreen] frame];
-	
+
 	announcementsWindow = [[PCOControlResponseWindow alloc] initWithContentRect:frameRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:[NSScreen mainScreen]];
 	announcementsWindow.keyPressDelegate = self;
 	announcementsWindow.delegate = self;
 	[announcementsWindow setLevel:NSScreenSaverWindowLevel];
 	[announcementsWindow setBackgroundColor:[NSColor blackColor]];
-	
+
 	[announcementsWindow makeKeyAndOrderFront:self];
-	
+
 	[NSCursor setHiddenUntilMouseMoves:YES];
-	
+
 	[[announcementsWindow contentView] setWantsLayer:YES];
 	
 	
-	
-	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"show_clock"] boolValue] == YES)
+	if ([announcerController shouldShowClock] == YES)
 	{
 		clockLayer = [CATextLayer layer];
-		NSDateFormatter *df = [[NSDateFormatter alloc] init];
-		//[df setDateFormat:@"yyyy/MM/dd hh:mm:ss Z"];
-		[df setDateStyle:NSDateFormatterLongStyle];
-		[df setTimeStyle:NSDateFormatterLongStyle];
+		
 		
 		clockLayer.frame = [[[announcementsWindow contentView] layer] bounds];
 		
-		clockLayer.string = [df stringFromDate:[NSDate date]];
+		clockLayer.string = [announcerController currentClockString];
 		
 		float clockSize = 35;
 		NSFont * clockFont = [NSFont fontWithName:@"Myriad Pro Bold" size:clockSize];
@@ -260,13 +274,10 @@
 		
 		[[[announcementsWindow contentView] layer] addSublayer:clockLayer];
 		
-		clockTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateClock) userInfo:nil repeats:YES];
 	}
 	
-	if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"show_flickr"] boolValue] == YES && [[NSScreen screens] count] > 1)
+	if ([announcerController shouldShowFlickr] == YES && [[NSScreen screens] count] > 1)
 	{
-		currentFlickrIndex = -1;
-		
 		flickrWindow = [[PCOControlResponseWindow alloc] initWithContentRect:[[[NSScreen screens] objectAtIndex:1] frame] styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
 		flickrWindow.keyPressDelegate = self;
 		flickrWindow.delegate = self;
@@ -277,49 +288,105 @@
 		
 		[[flickrWindow contentView] setWantsLayer:YES];
 		
-		
-		float secondsPerPicture = 10;
-		if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"seconds_per_picture"] floatValue] > 0)
-		{
-			secondsPerPicture = [[[NSUserDefaults standardUserDefaults] valueForKey:@"seconds_per_picture"] floatValue];
-		}
-		
 		[self nextPicture];
-		
-		flickrTimer = [NSTimer scheduledTimerWithTimeInterval:secondsPerPicture target:self selector:@selector(nextPicture) userInfo:nil repeats:YES];
 	}
 	
 	
-	currentSlideIndex = -1;
 	
-	[self nextSlide];
+	if ([[announcerController announcements] count] > 0)
+	{
+		[self nextSlide];
+	}
+	else
+	{
+		[self showBigLogo];
+	}
 }
 
 - (void)updateClock;
 {
-	NSDateFormatter *df = [[NSDateFormatter alloc] init];
-	//[df setDateFormat:@"yyyy/MM/dd hh:mm:ss Z"];
-	[df setDateStyle:NSDateFormatterLongStyle];
-	[df setTimeStyle:NSDateFormatterLongStyle];
-	
-	NSLog(@"time: %@", [df stringFromDate:[NSDate date]]);
-	
-	clockLayer.string = [df stringFromDate:[NSDate date]];
+	clockLayer.string = [announcerController currentClockString];
 }
+
+
+- (void)updateSlide;
+{
+
+	[titleLayer removeFromSuperlayer];
+	titleLayer = nil;
+
+	[bodyLayer removeFromSuperlayer];
+	bodyLayer = nil;
+
+	[backgroundLayer removeFromSuperlayer];
+
+
+	NSError * loadErr = nil;
+
+	QTMovie * backgroundMovie = [QTMovie movieWithFile:announcerController.currentBackgroundPath error:&loadErr];
+	backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+	backgroundLayer.contentsGravity = kCAGravityResizeAspect;
+
+	if (loadErr)
+	{
+		NSLog(@"err: %@", [loadErr localizedDescription]);
+	}
+
+	backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
+
+	[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
+
+
+	float titleFontSize = [self actualFontSizeForText:announcerController.currentTitle withFont:[NSFont fontWithName:@"Myriad Pro Bold" size:55] withOriginalSize:55];
+	NSFont * titleFont = [NSFont fontWithName:@"Myriad Pro Bold" size:titleFontSize];
+
+	NSSize titleBoxSize = [announcerController.currentTitle sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
+
+	titleLayer = [CATextLayer layer];
+	titleLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.size.height - titleBoxSize.height - 10, backgroundLayer.bounds.size.width, titleBoxSize.height);
+	titleLayer.string = announcerController.currentTitle;
+	titleLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
+	titleLayer.font = (__bridge CFTypeRef)titleFont;
+	titleLayer.fontSize = titleFontSize;
+	titleLayer.alignmentMode = kCAAlignmentCenter;
+	[backgroundLayer addSublayer:titleLayer];
+
+
+	float bodyFontSize = [self actualFontSizeForText:announcerController.currentBody withFont:[NSFont fontWithName:@"Myriad Pro" size:45] withOriginalSize:45];
+	NSFont * bodyFont = [NSFont fontWithName:@"Myriad Pro" size:bodyFontSize];
+
+	bodyLayer = [CATextLayer layer];
+	bodyLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.origin.y, backgroundLayer.bounds.size.width, backgroundLayer.bounds.size.height - titleBoxSize.height - 45);
+	bodyLayer.string = announcerController.currentBody;
+	bodyLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1);
+	bodyLayer.font = (__bridge CFTypeRef)bodyFont;
+	bodyLayer.fontSize = bodyFontSize;
+	bodyLayer.alignmentMode = kCAAlignmentCenter;
+	[backgroundLayer addSublayer:bodyLayer];
+
+	[NSCursor setHiddenUntilMouseMoves:YES];
+	
+}
+
+- (void)updateFlickrImage;
+{
+	[flickrLayer removeFromSuperlayer];
+	flickrLayer = nil;
+
+	QTMovie * backgroundMovie = [QTMovie movieWithFile:announcerController.currentFlickrImagePath error:nil];
+	flickrLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+	flickrLayer.contentsGravity = kCAGravityResizeAspect;
+
+	flickrLayer.frame = [[flickrWindow contentView] layer].bounds;
+
+	[[[flickrWindow contentView] layer] addSublayer:flickrLayer];
+}
+
+
 
 - (void)showBigLogo;
 {
-
-	NSInteger slideIndex = -1;
 	
-
-	[slideTimer invalidate], slideTimer = nil;
-
-	NSLog(@"playing slide %ld", slideIndex);
-
-
-
-
 	[titleLayer removeFromSuperlayer];
 	titleLayer = nil;
 
@@ -329,327 +396,46 @@
 	[backgroundLayer removeFromSuperlayer];
 
 
-	NSString * backgroundUrl = announcerController.logoUrl;
-	NSString * backgroundPath = nil;
-	if ([backgroundUrl isKindOfClass:[NSString class]])
-	{
-		backgroundPath = [announcerController pathForImageFileAtUrl:backgroundUrl];
-	}
+	[announcerController showBigLogoWithCompletion:^{
 
-	if (backgroundPath)
-	{
 		NSError * loadErr = nil;
 
-		if (![[NSFileManager defaultManager] fileExistsAtPath:backgroundPath])
+		NSString * backgroundPath = announcerController.logoPath;
+
+		QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:&loadErr];
+		backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+		backgroundLayer.contentsGravity = kCAGravityResizeAspect;
+		
+		if (loadErr)
 		{
-			NSLog(@"media resource missing from path: %@", backgroundPath);
-
-			[announcerController downloadImageFromUrl:backgroundUrl withCompletionBlock:^{
-
-				QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:nil];
-				backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
-				backgroundLayer.contentsGravity = kCAGravityResizeAspect;
-
-				if (loadErr)
-				{
-					NSLog(@"err: %@", [loadErr localizedDescription]);
-				}
-
-				backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
-
-				[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
-
-				
-
-			} andErrorBlock:^(NSError * err) {
-
-				backgroundLayer = [QTMovieLayer layer];
-
-				backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
-
-				[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
-
-
-
-			}];
+			NSLog(@"err: %@", [loadErr localizedDescription]);
 		}
-		else // if image exists
-		{
-			QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:&loadErr];
-			backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
-			backgroundLayer.contentsGravity = kCAGravityResizeAspect;
-
-			if (loadErr)
-			{
-				NSLog(@"err: %@", [loadErr localizedDescription]);
-			}
-
-			backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
-
-			[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
-
-
-		}
-
-	}
-	else
-	{
-		backgroundLayer = [QTMovieLayer layer];
 
 		backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
 
 		[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
 
+	}];
 
-	}
-
-
-
+	
 	[NSCursor setHiddenUntilMouseMoves:YES];
 
 }
 
+
+
+
+
+
 - (void)nextSlide;
 {
-	if ([[announcerController currentAnnouncements] count] == 0)
-	{
-		// just show logo
-		[self showBigLogo];
+	
+	[announcerController showNextSlideWithCompletion:^{
 
-		return;
-	}
+		[self updateSlide];
+		
+	}];
 
-	
-	NSInteger slideIndex = currentSlideIndex + 1;
-	
-	if (slideIndex < 0)
-	{
-		slideIndex = 0;
-	}
-	
-	if (slideIndex >= [[announcerController currentAnnouncements] count])
-	{
-		slideIndex = 0;
-	}
-	
-	[slideTimer invalidate], slideTimer = nil;
-	
-	float slideDuration = 10;
-	
-	NSLog(@"playing slide %ld", slideIndex);
-	
-	NSString * titleText = nil;//[[[announcerController currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"title"];
-	if (![[[[announcerController currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"title"] isEqual:[NSNull null]])
-	{
-		titleText = [[[announcerController currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"title"];
-	}
-	NSString * bodyText = nil;//[[[announcerController currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"body"];
-	if (![[[[announcerController currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"body"] isEqual:[NSNull null]])
-	{
-		bodyText = [[[announcerController currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"body"];
-	}
-	
-	
-	if ([[[announcerController currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"duration_seconds"])
-	{
-		slideDuration = [[[[announcerController currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"duration_seconds"] floatValue];
-	}
-	
-	
-	[titleLayer removeFromSuperlayer];
-	titleLayer = nil;
-	
-	[bodyLayer removeFromSuperlayer];
-	bodyLayer = nil;
-	
-	[backgroundLayer removeFromSuperlayer];
-	
-	
-	NSString * backgroundUrl = [[[announcerController currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"background_file_url"];
-	NSString * backgroundPath = nil;
-	if ([backgroundUrl isKindOfClass:[NSString class]])
-	{
-		backgroundPath = [announcerController pathForImageFileAtUrl:backgroundUrl];
-	}
-	
-	if (backgroundPath)
-	{
-		NSError * loadErr = nil;
-		
-		if (![[NSFileManager defaultManager] fileExistsAtPath:backgroundPath])
-		{
-			NSLog(@"media resource missing from path: %@", backgroundPath);
-			
-			[announcerController downloadImageFromUrl:backgroundUrl withCompletionBlock:^{
-				
-				QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:nil];
-				backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
-				backgroundLayer.contentsGravity = kCAGravityResizeAspect;
-				
-				if (loadErr)
-				{
-					NSLog(@"err: %@", [loadErr localizedDescription]);
-				}
-				
-				backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
-				
-				[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
-				
-				
-				float titleFontSize = [self actualFontSizeForText:titleText withFont:[NSFont fontWithName:@"Myriad Pro Bold" size:55] withOriginalSize:55];
-				NSFont * titleFont = [NSFont fontWithName:@"Myriad Pro Bold" size:titleFontSize];
-				
-				NSSize titleBoxSize = [titleText sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
-				
-				titleLayer = [CATextLayer layer];
-				titleLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.size.height - titleBoxSize.height - 10, backgroundLayer.bounds.size.width, titleBoxSize.height);
-				titleLayer.string = titleText;
-				titleLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
-				titleLayer.font = (__bridge CFTypeRef)titleFont;
-				titleLayer.fontSize = titleFontSize;
-				titleLayer.alignmentMode = kCAAlignmentCenter;
-				[backgroundLayer addSublayer:titleLayer];
-				
-				
-				float bodyFontSize = [self actualFontSizeForText:bodyText withFont:[NSFont fontWithName:@"Myriad Pro" size:45] withOriginalSize:45];
-				NSFont * bodyFont = [NSFont fontWithName:@"Myriad Pro" size:bodyFontSize];
-				
-				bodyLayer = [CATextLayer layer];
-				bodyLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.origin.y, backgroundLayer.bounds.size.width, backgroundLayer.bounds.size.height - titleBoxSize.height - 45);
-				bodyLayer.string = bodyText;
-				bodyLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1);
-				bodyLayer.font = (__bridge CFTypeRef)bodyFont;
-				bodyLayer.fontSize = bodyFontSize;
-				bodyLayer.alignmentMode = kCAAlignmentCenter;
-				[backgroundLayer addSublayer:bodyLayer];
-				
-			} andErrorBlock:^(NSError * err) {
-				
-				backgroundLayer = [QTMovieLayer layer];
-				
-				backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
-				
-				[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
-				
-				
-				float titleFontSize = [self actualFontSizeForText:titleText withFont:[NSFont fontWithName:@"Myriad Pro Bold" size:55] withOriginalSize:55];
-				NSFont * titleFont = [NSFont fontWithName:@"Myriad Pro Bold" size:titleFontSize];
-				
-				NSSize titleBoxSize = [titleText sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
-				
-				titleLayer = [CATextLayer layer];
-				titleLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.size.height - titleBoxSize.height - 10, backgroundLayer.bounds.size.width, titleBoxSize.height);
-				titleLayer.string = titleText;
-				titleLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
-				titleLayer.font = (__bridge CFTypeRef)titleFont;
-				titleLayer.fontSize = titleFontSize;
-				titleLayer.alignmentMode = kCAAlignmentCenter;
-				[backgroundLayer addSublayer:titleLayer];
-				
-				
-				float bodyFontSize = [self actualFontSizeForText:bodyText withFont:[NSFont fontWithName:@"Myriad Pro" size:45] withOriginalSize:45];
-				NSFont * bodyFont = [NSFont fontWithName:@"Myriad Pro" size:bodyFontSize];
-				
-				bodyLayer = [CATextLayer layer];
-				bodyLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.origin.y, backgroundLayer.bounds.size.width, backgroundLayer.bounds.size.height - titleBoxSize.height - 45);
-				bodyLayer.string = bodyText;
-				bodyLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1);
-				bodyLayer.font = (__bridge CFTypeRef)bodyFont;
-				bodyLayer.fontSize = bodyFontSize;
-				bodyLayer.alignmentMode = kCAAlignmentCenter;
-				[backgroundLayer addSublayer:bodyLayer];
-				
-			}];
-		}
-		else // if image exists
-		{
-			QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:&loadErr];
-			backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
-			backgroundLayer.contentsGravity = kCAGravityResizeAspect;
-			
-			if (loadErr)
-			{
-				NSLog(@"err: %@", [loadErr localizedDescription]);
-			}
-			
-			backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
-			
-			[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
-			
-			
-			float titleFontSize = [self actualFontSizeForText:titleText withFont:[NSFont fontWithName:@"Myriad Pro Bold" size:55] withOriginalSize:55];
-			NSFont * titleFont = [NSFont fontWithName:@"Myriad Pro Bold" size:titleFontSize];
-			
-			NSSize titleBoxSize = [titleText sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
-			
-			titleLayer = [CATextLayer layer];
-			titleLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.size.height - titleBoxSize.height - 10, backgroundLayer.bounds.size.width, titleBoxSize.height);
-			titleLayer.string = titleText;
-			titleLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
-			titleLayer.font = (__bridge CFTypeRef)titleFont;
-			titleLayer.fontSize = titleFontSize;
-			titleLayer.alignmentMode = kCAAlignmentCenter;
-			[backgroundLayer addSublayer:titleLayer];
-			
-			
-			float bodyFontSize = [self actualFontSizeForText:bodyText withFont:[NSFont fontWithName:@"Myriad Pro" size:45] withOriginalSize:45];
-			NSFont * bodyFont = [NSFont fontWithName:@"Myriad Pro" size:bodyFontSize];
-			
-			bodyLayer = [CATextLayer layer];
-			bodyLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.origin.y, backgroundLayer.bounds.size.width, backgroundLayer.bounds.size.height - titleBoxSize.height - 45);
-			bodyLayer.string = bodyText;
-			bodyLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1);
-			bodyLayer.font = (__bridge CFTypeRef)bodyFont;
-			bodyLayer.fontSize = bodyFontSize;
-			bodyLayer.alignmentMode = kCAAlignmentCenter;
-			[backgroundLayer addSublayer:bodyLayer];
-		}
-		
-	}
-	else
-	{
-		backgroundLayer = [QTMovieLayer layer];
-		
-		backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
-		
-		[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
-		
-		
-		float titleFontSize = [self actualFontSizeForText:titleText withFont:[NSFont fontWithName:@"Myriad Pro Bold" size:55] withOriginalSize:55];
-		NSFont * titleFont = [NSFont fontWithName:@"Myriad Pro Bold" size:titleFontSize];
-		
-		NSSize titleBoxSize = [titleText sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
-		
-		titleLayer = [CATextLayer layer];
-		titleLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.size.height - titleBoxSize.height - 10, backgroundLayer.bounds.size.width, titleBoxSize.height);
-		titleLayer.string = titleText;
-		titleLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
-		titleLayer.font = (__bridge CFTypeRef)titleFont;
-		titleLayer.fontSize = titleFontSize;
-		titleLayer.alignmentMode = kCAAlignmentCenter;
-		[backgroundLayer addSublayer:titleLayer];
-		
-		
-		float bodyFontSize = [self actualFontSizeForText:bodyText withFont:[NSFont fontWithName:@"Myriad Pro" size:45] withOriginalSize:45];
-		NSFont * bodyFont = [NSFont fontWithName:@"Myriad Pro" size:bodyFontSize];
-		
-		bodyLayer = [CATextLayer layer];
-		bodyLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.origin.y, backgroundLayer.bounds.size.width, backgroundLayer.bounds.size.height - titleBoxSize.height - 45);
-		bodyLayer.string = bodyText;
-		bodyLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1);
-		bodyLayer.font = (__bridge CFTypeRef)bodyFont;
-		bodyLayer.fontSize = bodyFontSize;
-		bodyLayer.alignmentMode = kCAAlignmentCenter;
-		[backgroundLayer addSublayer:bodyLayer];
-	}
-	
-	
-	
-	[NSCursor setHiddenUntilMouseMoves:YES];
-	
-	currentSlideIndex = slideIndex;
-	
-	slideTimer = [NSTimer scheduledTimerWithTimeInterval:slideDuration target:self selector:@selector(nextSlide) userInfo:nil repeats:NO];
 }
 
 
@@ -657,82 +443,14 @@
 {
 	NSLog(@"next flickr");
 	
-	[flickrLayer removeFromSuperlayer];
-	flickrLayer = nil;
 	
-	NSInteger picIndex = currentFlickrIndex + 1;
-	
-	if (picIndex < 0)
-	{
-		picIndex = 0;
-	}
-	
-	if (picIndex >= [[announcerController flickrImageUrls] count])
-	{
-		picIndex = 0;
-	}
+	[announcerController showNextFlickrImageWithCompletion:^{
+
+		[self updateFlickrImage];
+
+	}];
 	
 	
-	NSString * backgroundUrl = [[announcerController flickrImageUrls] objectAtIndex:picIndex];
-	NSString * backgroundPath = nil;
-	if ([backgroundUrl isKindOfClass:[NSString class]])
-	{
-		backgroundPath = [announcerController pathForImageFileAtUrl:backgroundUrl];
-	}
-	
-	if (backgroundPath)
-	{
-		NSError * loadErr = nil;
-		
-		if (![[NSFileManager defaultManager] fileExistsAtPath:backgroundPath])
-		{
-			NSLog(@"media resource missing from path: %@", backgroundPath);
-			
-			[announcerController downloadImageFromUrl:backgroundUrl withCompletionBlock:^{
-				
-				QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:nil];
-				flickrLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
-				flickrLayer.contentsGravity = kCAGravityResizeAspect;
-				
-				flickrLayer.frame = [[flickrWindow contentView] layer].bounds;
-				
-				[[[flickrWindow contentView] layer] addSublayer:flickrLayer];
-				
-			} andErrorBlock:^(NSError * err) {
-				
-				flickrLayer = [QTMovieLayer layer];
-				flickrLayer.frame = [[flickrWindow contentView] layer].bounds;
-				
-				[[[flickrWindow contentView] layer] addSublayer:flickrLayer];
-				
-			}];
-		}
-		else
-		{
-			QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:nil];
-			flickrLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
-			flickrLayer.contentsGravity = kCAGravityResizeAspect;
-			
-			flickrLayer.frame = [[flickrWindow contentView] layer].bounds;
-			
-			[[[flickrWindow contentView] layer] addSublayer:flickrLayer];
-		}
-		
-		if (loadErr)
-		{
-			NSLog(@"err: %@", [loadErr localizedDescription]);
-		}
-	}
-	else
-	{
-		flickrLayer = [QTMovieLayer layer];
-		
-		flickrLayer.frame = [[flickrWindow contentView] layer].bounds;
-		
-		[[[flickrWindow contentView] layer] addSublayer:flickrLayer];
-	}
-	
-	currentFlickrIndex = picIndex;
 }
 
 
@@ -747,20 +465,20 @@
 	titleLayer = nil;
 	bodyLayer = nil;
 	
-	currentSlideIndex = -1;
+	
 	
 	[flickrLayer removeFromSuperlayer];
 	
 	[flickrWindow orderOut:sender];
 	flickrWindow = nil;
 	
-	[clockTimer invalidate], clockTimer = nil;
-	[slideTimer invalidate], slideTimer = nil;
-	[flickrTimer invalidate], flickrTimer = nil;
+	[announcerController allStop];
 }
 
 
 
+
+#pragma mark - Keyboard shortcuts
 
 - (void)leftArrowPressed;
 {

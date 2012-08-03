@@ -17,26 +17,16 @@
 
 #import "PCOControlResponseWindow.h"
 
-@interface PCOAnnouncerWindowController : NSWindowController <PCOControlResponseWindowDelegate, NSWindowDelegate>
+@interface PCOAnnouncerWindowController : NSWindowController <PCOControlResponseWindowDelegate, NSWindowDelegate, PCOAnnouncerControllerDelegate>
 {
 	PCOAnnouncerController * announcerController;
-	
-	IBOutlet NSBox * flickrSettingsBox;
-	
+
 	IBOutlet NSTextField * announcementsFeedField;
-	IBOutlet NSTextField * flickrFeedField;
-	
+
 	IBOutlet NSProgressIndicator * announcementsActivitySpinner;
-	IBOutlet NSProgressIndicator * flickrActivitySpinner;
-	
+
 	IBOutlet NSTextField * announcementsStatusLabel;
-	IBOutlet NSTextField * flickrStatusLabel;
 	
-	IBOutlet NSButton * flickrToggleSwitch;
-	
-	
-	
-	NSInteger currentSlideIndex;
 	
 	PCOControlResponseWindow * announcementsWindow;
 	
@@ -47,21 +37,18 @@
 	
 	CATextLayer * clockLayer;
 	
-	NSTimer * clockTimer;
-	NSTimer * slideTimer;
 	
 	
-	NSInteger currentFlickrIndex;
-	NSTimer * flickrTimer;
+
 	PCOControlResponseWindow * flickrWindow;
 	QTMovieLayer * flickrLayer;
 }
 
-- (IBAction)toggleFlickr:(id)sender;
+//- (IBAction)toggleFlickr:(id)sender;
 
 - (IBAction)announcementsUrlChanged:(id)sender;
 
-- (IBAction)flickrUrlChanged:(id)sender;
+//- (IBAction)flickrUrlChanged:(id)sender;
 
 
 - (IBAction)startSlideshow:(id)sender;
