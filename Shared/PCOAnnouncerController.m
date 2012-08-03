@@ -81,7 +81,7 @@
 - (void)showBigLogoWithCompletion:(void (^)(void))completionBlock;
 {
 	NSInteger slideIndex = -1;
-
+	
 	NSLog(@"playing slide %ld", slideIndex);
 
 	if (!self.logoUrl)
@@ -305,6 +305,11 @@
 		[self.delegate slideUpdated];
 
 	}];
+
+	if (!clockTimer)
+	{
+		clockTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateClock) userInfo:nil repeats:YES];
+	}
 }
 
 - (void)nextPicture;
