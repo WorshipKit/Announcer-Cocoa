@@ -36,6 +36,39 @@
 
 - (NSString *)currentClockString;
 {
+	if ([[self serviceTimes] count] > 0)
+	{
+		NSDate * activeDate = [[self serviceTimes] lastObject];
+		double secondsRemaining = [[NSDate date] timeIntervalSinceDate:activeDate] * -1;
+
+		double remainder = secondsRemaining;
+		int hours = remainder / 3600;
+		remainder = remainder - (hours * 3600);
+		int minutes = remainder / 60;
+		remainder = remainder - (minutes * 60);
+		//int seconds = remainder;
+
+		NSString * seconds = [NSString stringWithFormat:@"%d", (int)remainder];
+		if (remainder < 10)
+		{
+			seconds = [NSString stringWithFormat:@"0%d", (int)remainder];
+		}
+
+		NSString * formatString = [NSString stringWithFormat:@"Service starts in %d:%d:%@", hours, minutes, seconds];
+		if (hours == 0)
+		{
+			formatString = [NSString stringWithFormat:@"Service starts in %d:%@", minutes, seconds];
+
+			if (minutes == 0)
+			{
+				formatString = [NSString stringWithFormat:@"Service starts in %@", seconds];
+			}
+		}
+
+		return formatString;
+	}
+
+
 	NSDateFormatter *df = [[NSDateFormatter alloc] init];
 	//[df setDateFormat:@"yyyy/MM/dd hh:mm:ss Z"];
 	[df setDateStyle:NSDateFormatterLongStyle];
@@ -617,11 +650,41 @@
 
 		if ([resultsDictionary objectForKey:@"service_times"])
 		{
-			NSArray * times = [resultsDictionary objectForKey:@"service_times"];
+			NSArray * rawTimes = [resultsDictionary objectForKey:@"service_times"];
+
+			NSMutableArray * parsedTimes = [NSMutableArray array];
+
+			NSLog(@"current day of week: %ld", [self dayOfWeek]);
+
+			for (NSDictionary * time in rawTimes)
+			{
+				int day = [[time valueForKey:@"day"] intValue];
+				int hour = [[time valueForKey:@"hour"] intValue];
+				int minute = [[time valueForKey:@"minute"] intValue];
+
+				if (day == [self dayOfWeek])
+				{
+					unsigned unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
+					NSDate *date = [NSDate date];
+					NSCalendar *calendar = [NSCalendar currentCalendar];
+					[calendar setTimeZone:[NSTimeZone localTimeZone]];
+					NSDateComponents *comps = [calendar components:unitFlags fromDate:date];
+					
+					//update for the start date
+					[comps setHour:hour];
+					[comps setMinute:minute];
+					[comps setSecond:0];
+					NSDate *sDate = [calendar dateFromComponents:comps];
+
+					[parsedTimes addObject:sDate];
+				}
+			}
 
 			dispatch_async(dispatch_get_main_queue(), ^{
 
-				self.serviceTimes = times;
+				NSLog(@"times: %@", parsedTimes);
+
+				self.serviceTimes = parsedTimes;
 
 			});
 		}
@@ -812,7 +875,7 @@
 
 	NSDateComponents * weekdayComponents = [gregorian components:NSWeekdayCalendarUnit fromDate:[NSDate date]];
 
-	NSInteger weekday = [weekdayComponents weekday];
+	NSInteger weekday = [weekdayComponents weekday] - 1;
 	// weekday 1 = Sunday for Gregorian calendar
 
 	return weekday;

@@ -232,8 +232,8 @@
 
 	NSLog(@"found %lu announcements to show.", [[announcerController currentAnnouncements] count]);
 
-	NSRect frameRect = NSMakeRect(100, 100, 340, 280);
-	//NSRect frameRect = [[NSScreen mainScreen] frame];
+	//NSRect frameRect = NSMakeRect(100, 100, 340, 280);
+	NSRect frameRect = [[NSScreen mainScreen] frame];
 
 	announcementsWindow = [[PCOControlResponseWindow alloc] initWithContentRect:frameRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:[NSScreen mainScreen]];
 	announcementsWindow.keyPressDelegate = self;
