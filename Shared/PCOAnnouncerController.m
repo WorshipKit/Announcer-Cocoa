@@ -14,8 +14,6 @@
 
 @implementation PCOAnnouncerController
 
-@synthesize logoUrl, announcements, flickrImageUrls, serviceTimes;
-
 - (id)init;
 {
 	self = [super init];
@@ -27,11 +25,38 @@
 		currentFlickrIndex = -1;
 
 		clockTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateClock) userInfo:nil repeats:YES];
+
+		feedUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:60*5 target:self selector:@selector(autoUpdateFeed) userInfo:nil repeats:YES];
 	}
 	
 	return self;
 }
 
+
+- (void)autoUpdateFeed;
+{
+	NSLog(@"it's been 5 minutes. auto-updating feed.");
+
+	[self loadAnnouncementsWithCompletionBlock:^{
+
+		NSLog(@"Loaded announcements in background.");
+
+	} andErrorBlock:^(NSError * error) {
+
+		NSLog(@"Error auto-loading announcements.");
+
+	}];
+	
+	[self loadFlickrFeedWithCompletionBlock:^{
+
+		NSLog(@"Loaded flickr updates in background.");
+
+	} andErrorBlock:^(NSError * error) {
+
+		NSLog(@"Error auto-loading flickr");
+
+	}];
+}
 
 
 - (NSString *)currentClockString;
@@ -159,6 +184,9 @@
 - (void)showNextSlideWithCompletion:(void (^)(void))completionBlock;
 {
 	[slideTimer invalidate], slideTimer = nil;
+
+	self.currentTitle = nil;
+	self.currentBody = nil;
 
 	if ([[self currentAnnouncements] count] == 0)
 	{
@@ -531,7 +559,7 @@
 }
 
 
-- (void)loadAnnouncementsFromFeedLocation:(NSString *)feedUrl withCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))errorBlock;
+- (void)loadAnnouncementsWithCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))errorBlock;
 {
 	dispatch_queue_t reqQueue = dispatch_queue_create("com.pco.announcer.requests", NULL);
     dispatch_async(reqQueue, ^{
@@ -539,7 +567,7 @@
 		NSError * err = nil;
 		
 		NSURLResponse * response = nil;
-		NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL URLWithString:feedUrl]];
+		NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.announcementsFeedUrl]];
 		
 		NSData* jsonData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
 		
@@ -740,7 +768,7 @@
 }
 
 
-- (void)loadFlickrFeedFromLocation:(NSString *)feedUrl withCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))errorBlock;
+- (void)loadFlickrFeedWithCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))errorBlock;
 {
 	
 	dispatch_queue_t reqQueue = dispatch_queue_create("com.pco.announcer.requests", NULL);
@@ -749,7 +777,7 @@
 		NSError * err = nil;
 		
 		NSURLResponse * response = nil;
-		NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL URLWithString:feedUrl]];
+		NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.flickrFeedUrl]];
 		
 		NSData* jsonData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
 		

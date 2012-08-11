@@ -39,6 +39,8 @@
 	NSArray * flickrImageUrls;
 
 
+	NSTimer * feedUpdateTimer;
+	
 	NSTimer * clockTimer;
 	NSTimer * slideTimer;
 	NSInteger currentSlideIndex;
@@ -56,9 +58,13 @@
 
 
 
-- (void)loadAnnouncementsFromFeedLocation:(NSString *)feedUrl withCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))error;
+@property (nonatomic, strong) NSString * announcementsFeedUrl;
+@property (nonatomic, strong) NSString * flickrFeedUrl;
 
-- (void)loadFlickrFeedFromLocation:(NSString *)feedUrl withCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))errorBlock;
+
+- (void)loadAnnouncementsWithCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))error;
+
+- (void)loadFlickrFeedWithCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))errorBlock;
 
 - (void)downloadImageFromUrl:(NSString *)imageUrl withCompletionBlock:(void (^)(void))completionBlock andErrorBlock:(void (^)(NSError * error))errorBlock;
 

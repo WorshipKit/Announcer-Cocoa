@@ -87,7 +87,7 @@
 		960A5BA915535BE300DB4EB9 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		960A5BD615535BE300DB4EB9 /* Announcer iOS Unit Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Announcer iOS Unit Tests.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		960A5BD715535BE300DB4EB9 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		960A5BF215535E5800DB4EB9 /* Announcer Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Announcer Mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		960A5BF215535E5800DB4EB9 /* Announcer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Announcer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		960A5BF415535E5800DB4EB9 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		960A5BF715535E5800DB4EB9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		960A5BF815535E5800DB4EB9 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -204,7 +204,7 @@
 			children = (
 				960A5BA115535BE300DB4EB9 /* Announcer iOS.app */,
 				960A5BD615535BE300DB4EB9 /* Announcer iOS Unit Tests.octest */,
-				960A5BF215535E5800DB4EB9 /* Announcer Mac.app */,
+				960A5BF215535E5800DB4EB9 /* Announcer.app */,
 				960A5C1115535E5800DB4EB9 /* Announcer Mac Unit Tests.octest */,
 			);
 			name = Products;
@@ -411,7 +411,7 @@
 			);
 			name = "Announcer Mac";
 			productName = "Announcer Mac";
-			productReference = 960A5BF215535E5800DB4EB9 /* Announcer Mac.app */;
+			productReference = 960A5BF215535E5800DB4EB9 /* Announcer.app */;
 			productType = "com.apple.product-type.application";
 		};
 		960A5C1015535E5800DB4EB9 /* Announcer Mac Unit Tests */ = {
@@ -783,7 +783,7 @@
 				INFOPLIST_FILE = "Mac/Announcer Mac-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Announcer;
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -805,7 +805,7 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				INFOPLIST_FILE = "Mac/Announcer Mac-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Announcer;
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
