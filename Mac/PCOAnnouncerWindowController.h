@@ -37,7 +37,7 @@
 	
 	CATextLayer * clockLayer;
 	
-	
+	CATextLayer * bigClockLayer;
 	
 
 	PCOControlResponseWindow * flickrWindow;

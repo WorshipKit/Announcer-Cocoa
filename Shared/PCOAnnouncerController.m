@@ -109,7 +109,6 @@
 {
 	if ([self nextServiceTime])
 	{
-
 		NSDate * activeDate = [self nextServiceTime];
 		double secondsRemaining = [[NSDate date] timeIntervalSinceDate:activeDate] * -1;
 
@@ -126,15 +125,21 @@
 			seconds = [NSString stringWithFormat:@"0%d", (int)remainder];
 		}
 
-		NSString * formatString = [NSString stringWithFormat:@"Service starts in %d:%d:%@", hours, minutes, seconds];
+		NSString * formatString = [NSString stringWithFormat:@"%d:%d:%@", hours, minutes, seconds];
 		if (hours == 0)
 		{
-			formatString = [NSString stringWithFormat:@"Service starts in %d:%@", minutes, seconds];
+			formatString = [NSString stringWithFormat:@"%d:%@", minutes, seconds];
 
 			if (minutes == 0)
 			{
-				formatString = [NSString stringWithFormat:@"Service starts in %@", seconds];
+				formatString = [NSString stringWithFormat:@"%@", seconds];
 			}
+		}
+
+
+		if (![self shouldShowBigCountdown])
+		{
+			return [NSString stringWithFormat:@"Service starts in %@", formatString];
 		}
 
 		return formatString;

@@ -97,6 +97,9 @@
 
 - (NSString *)currentClockString;
 
+
+- (BOOL)shouldShowBigCountdown;
+
 - (BOOL)shouldShowClock;
 - (void)setShouldShowClock:(BOOL)flag;
 

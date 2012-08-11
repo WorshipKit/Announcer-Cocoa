@@ -234,8 +234,8 @@
 
 	NSLog(@"found %lu announcements to show.", [[announcerController currentAnnouncements] count]);
 
-	NSRect frameRect = NSMakeRect(100, 100, 340, 280);
-	//NSRect frameRect = [[NSScreen mainScreen] frame];
+	//NSRect frameRect = NSMakeRect(100, 100, 340, 280);
+	NSRect frameRect = [[NSScreen mainScreen] frame];
 
 	announcementsWindow = [[PCOControlResponseWindow alloc] initWithContentRect:frameRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:[NSScreen mainScreen]];
 	announcementsWindow.keyPressDelegate = self;
@@ -253,7 +253,6 @@
 	if ([announcerController shouldShowClock] == YES)
 	{
 		clockLayer = [CATextLayer layer];
-		
 		
 		clockLayer.frame = [[[announcementsWindow contentView] layer] bounds];
 		
@@ -275,6 +274,32 @@
 		clockLayer.frame = CGRectMake(20, 20, [[[announcementsWindow contentView] layer] bounds].size.width - 40, clockBoxSize.height);
 		
 		[[[announcementsWindow contentView] layer] addSublayer:clockLayer];
+
+
+		bigClockLayer = [CATextLayer layer];
+
+		bigClockLayer.frame = [[[announcementsWindow contentView] layer] bounds];
+
+		bigClockLayer.string = @"0:00";
+
+		float bigClockSize = 150;
+		NSFont * bigClockFont = [NSFont fontWithName:@"Myriad Pro Bold" size:bigClockSize];
+		bigClockSize = [self actualFontSizeForText:bigClockLayer.string withFont:bigClockFont withOriginalSize:bigClockSize];
+		bigClockFont = [NSFont fontWithName:bigClockFont.fontName size:bigClockSize];
+
+		NSSize bigClockBoxSize = [bigClockLayer.string sizeWithAttributes:[NSDictionary dictionaryWithObject:bigClockFont forKey:NSFontAttributeName]];
+
+		bigClockLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
+		bigClockLayer.font = (__bridge CFTypeRef)bigClockFont;
+		bigClockLayer.fontSize = bigClockSize;
+		bigClockLayer.alignmentMode = kCAAlignmentCenter;
+		bigClockLayer.shadowOpacity = 1.0;
+
+		bigClockLayer.frame = CGRectMake(20, ([[[announcementsWindow contentView] layer] bounds].size.height / 2) - (bigClockBoxSize.height / 2), [[[announcementsWindow contentView] layer] bounds].size.width - 40, bigClockBoxSize.height);
+
+		[[[announcementsWindow contentView] layer] addSublayer:bigClockLayer];
+
+		bigClockLayer.hidden = YES;
 		
 	}
 	
@@ -307,6 +332,26 @@
 
 - (void)updateClock;
 {
+	if ([announcerController shouldShowBigCountdown])
+	{
+		titleLayer.hidden = YES;
+		bodyLayer.hidden = YES;
+		backgroundLayer.hidden = YES;
+		clockLayer.hidden = YES;
+
+		bigClockLayer.hidden = NO;
+	}
+	else
+	{
+		titleLayer.hidden = NO;
+		bodyLayer.hidden = NO;
+		backgroundLayer.hidden = NO;
+		clockLayer.hidden = NO;
+
+		bigClockLayer.hidden = YES;
+	}
+
+	bigClockLayer.string = [announcerController currentClockString];
 	clockLayer.string = [announcerController currentClockString];
 }
 
