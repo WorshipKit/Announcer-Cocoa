@@ -59,11 +59,58 @@
 }
 
 
-- (NSString *)currentClockString;
+
+
+- (NSDate *)nextServiceTime;
 {
 	if ([[self serviceTimes] count] > 0)
 	{
-		NSDate * activeDate = [[self serviceTimes] lastObject];
+		//NSDate * activeDate = [[self serviceTimes] lastObject];
+		//double secondsRemaining = [[NSDate date] timeIntervalSinceDate:activeDate] * -1;
+
+		double threshold = 18000; // 18000 seconds in an hour
+
+		NSDate * currentWinningDate = nil;
+		double currentWinningDifference = threshold;
+
+		for (NSDate * aDate in [self serviceTimes])
+		{
+			double secondsRemaining = [[NSDate date] timeIntervalSinceDate:aDate] * -1;
+
+			if (secondsRemaining < currentWinningDifference && secondsRemaining > 0)
+			{
+				currentWinningDifference = secondsRemaining;
+				currentWinningDate = aDate;
+			}
+		}
+
+		return currentWinningDate;
+	}
+
+	return nil;
+}
+
+- (BOOL)shouldShowBigCountdown;
+{
+	double threshold = 301;
+
+	NSDate * activeDate = [self nextServiceTime];
+	double secondsRemaining = [[NSDate date] timeIntervalSinceDate:activeDate] * -1;
+
+	if (secondsRemaining < threshold)
+	{
+		return YES;
+	}
+
+	return NO;
+}
+
+- (NSString *)currentClockString;
+{
+	if ([self nextServiceTime])
+	{
+
+		NSDate * activeDate = [self nextServiceTime];
 		double secondsRemaining = [[NSDate date] timeIntervalSinceDate:activeDate] * -1;
 
 		double remainder = secondsRemaining;
@@ -690,10 +737,16 @@
 				int hour = [[time valueForKey:@"hour"] intValue];
 				int minute = [[time valueForKey:@"minute"] intValue];
 
-				if (day == [self dayOfWeek])
+
+
+				if (day == [self dayOfWeek] || day == [self tomorrowDayOfWeek])
 				{
 					unsigned unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
 					NSDate *date = [NSDate date];
+					if (day == [self tomorrowDayOfWeek])
+					{
+						date = [date dateByAddingTimeInterval:18400];
+					}
 					NSCalendar *calendar = [NSCalendar currentCalendar];
 					[calendar setTimeZone:[NSTimeZone localTimeZone]];
 					NSDateComponents *comps = [calendar components:unitFlags fromDate:date];
@@ -703,6 +756,14 @@
 					[comps setMinute:minute];
 					[comps setSecond:0];
 					NSDate *sDate = [calendar dateFromComponents:comps];
+
+					NSDateFormatter *df = [[NSDateFormatter alloc] init];
+					//[df setDateFormat:@"yyyy/MM/dd hh:mm:ss Z"];
+					[df setDateStyle:NSDateFormatterLongStyle];
+					[df setTimeStyle:NSDateFormatterLongStyle];
+					[df setTimeZone:[NSTimeZone localTimeZone]];
+
+					NSLog(@"adding date: %@", [df stringFromDate:sDate]);
 
 					[parsedTimes addObject:sDate];
 				}
@@ -902,6 +963,18 @@
 	NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 
 	NSDateComponents * weekdayComponents = [gregorian components:NSWeekdayCalendarUnit fromDate:[NSDate date]];
+
+	NSInteger weekday = [weekdayComponents weekday] - 1;
+	// weekday 1 = Sunday for Gregorian calendar
+
+	return weekday;
+}
+
+- (NSInteger)tomorrowDayOfWeek;
+{
+	NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+
+	NSDateComponents * weekdayComponents = [gregorian components:NSWeekdayCalendarUnit fromDate:[[NSDate date] dateByAddingTimeInterval:86400]];
 
 	NSInteger weekday = [weekdayComponents weekday] - 1;
 	// weekday 1 = Sunday for Gregorian calendar
