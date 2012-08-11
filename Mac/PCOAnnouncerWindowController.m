@@ -250,8 +250,8 @@
 	[[announcementsWindow contentView] setWantsLayer:YES];
 	
 	
-	if ([announcerController shouldShowClock] == YES)
-	{
+	//if ([announcerController shouldShowClock] == YES)
+	//{
 		clockLayer = [CATextLayer layer];
 		
 		clockLayer.frame = [[[announcementsWindow contentView] layer] bounds];
@@ -301,7 +301,7 @@
 
 		bigClockLayer.hidden = YES;
 		
-	}
+	//}
 	
 	if ([announcerController shouldShowFlickr] == YES && [[NSScreen screens] count] > 1)
 	{

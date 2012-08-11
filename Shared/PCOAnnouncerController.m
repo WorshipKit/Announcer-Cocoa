@@ -145,13 +145,18 @@
 		return formatString;
 	}
 
+	if ([self shouldShowClock])
+	{
+		NSDateFormatter *df = [[NSDateFormatter alloc] init];
+		//[df setDateFormat:@"yyyy/MM/dd hh:mm:ss Z"];
+		[df setDateStyle:NSDateFormatterLongStyle];
+		[df setTimeStyle:NSDateFormatterLongStyle];
 
-	NSDateFormatter *df = [[NSDateFormatter alloc] init];
-	//[df setDateFormat:@"yyyy/MM/dd hh:mm:ss Z"];
-	[df setDateStyle:NSDateFormatterLongStyle];
-	[df setTimeStyle:NSDateFormatterLongStyle];
-	
-	return [df stringFromDate:[NSDate date]];
+		return [df stringFromDate:[NSDate date]];
+	}
+
+	return @"";
+
 }
 
 
