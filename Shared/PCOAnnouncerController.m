@@ -24,8 +24,10 @@
 		currentSlideIndex = -1;
 		currentFlickrIndex = -1;
 
-		clockTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateClock) userInfo:nil repeats:YES];
+		_showLogo = YES;
 
+		clockTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateClock) userInfo:nil repeats:YES];
+		
 		feedUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:60*5 target:self selector:@selector(autoUpdateFeed) userInfo:nil repeats:YES];
 	}
 	
@@ -327,6 +329,19 @@
 		completionBlock();
 	}
 
+
+
+	_showLogo = ![[[[self currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"show_logo"] boolValue];
+	if (_showLogo)
+	{
+		NSLog(@"showing logo");
+	}
+	else
+	{
+		NSLog(@"dont' show logo");
+	}
+
+
 	currentSlideIndex = slideIndex;
 	
 	slideTimer = [NSTimer scheduledTimerWithTimeInterval:slideDuration target:self selector:@selector(nextSlide) userInfo:nil repeats:NO];
@@ -616,6 +631,37 @@
 }
 
 
+- (void)loadLogoWithCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * err))errorBlock
+{
+	if (![[NSFileManager defaultManager] fileExistsAtPath:self.logoPath])
+	{
+		if (!self.logoPath)
+		{
+			self.logoPath = [self pathForImageFileAtUrl:self.logoUrl];
+		}
+
+		[self downloadImageFromUrl:self.logoUrl withCompletionBlock:^{
+
+			self.currentBackgroundPath = self.logoPath;
+
+			completion();
+
+		} andErrorBlock:^(NSError * error) {
+
+			self.currentBackgroundPath = nil;
+
+			errorBlock(error);
+
+		}];
+	}
+	else
+	{
+		self.currentBackgroundPath = self.logoPath;
+
+		completion();
+	}
+}
+
 - (void)loadAnnouncementsWithCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))errorBlock;
 {
 	dispatch_queue_t reqQueue = dispatch_queue_create("com.pco.announcer.requests", NULL);
@@ -679,11 +725,13 @@
 
 					self.logoUrl = newLogo;
 
-					NSLog(@"loading logo from %@", logoUrl);
+					NSLog(@"loading logo from %@", _logoUrl);
 
-					[self downloadImageFromUrl:logoUrl withCompletionBlock:^{
+					[self downloadImageFromUrl:_logoUrl withCompletionBlock:^{
 
 						NSLog(@"downloaded logo image");
+
+						self.logoPath = [self pathForImageFileAtUrl:self.logoUrl];
 
 					} andErrorBlock:^(NSError * error) {
 
@@ -933,7 +981,7 @@
 			
 			if ([newImageUrls count] > 0)
 			{
-				flickrImageUrls = newImageUrls;
+				_flickrImageUrls = newImageUrls;
 			}
 			
 			dispatch_async(dispatch_get_main_queue(), ^{

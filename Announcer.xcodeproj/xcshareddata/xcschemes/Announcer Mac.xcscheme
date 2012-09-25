@@ -14,7 +14,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "960A5BF115535E5800DB4EB9"
-               BuildableName = "Announcer Mac.app"
+               BuildableName = "Announcer.app"
                BlueprintName = "Announcer Mac"
                ReferencedContainer = "container:Announcer.xcodeproj">
             </BuildableReference>
@@ -42,7 +42,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "960A5BF115535E5800DB4EB9"
-            BuildableName = "Announcer Mac.app"
+            BuildableName = "Announcer.app"
             BlueprintName = "Announcer Mac"
             ReferencedContainer = "container:Announcer.xcodeproj">
          </BuildableReference>
@@ -61,7 +61,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "960A5BF115535E5800DB4EB9"
-            BuildableName = "Announcer Mac.app"
+            BuildableName = "Announcer.app"
             BlueprintName = "Announcer Mac"
             ReferencedContainer = "container:Announcer.xcodeproj">
          </BuildableReference>
@@ -79,7 +79,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "960A5BF115535E5800DB4EB9"
-            BuildableName = "Announcer Mac.app"
+            BuildableName = "Announcer.app"
             BlueprintName = "Announcer Mac"
             ReferencedContainer = "container:Announcer.xcodeproj">
          </BuildableReference>

@@ -32,11 +32,6 @@
 
 @interface PCOAnnouncerController : NSObject
 {
-	NSString * logoUrl;
-	NSArray * announcements;
-
-	NSArray * serviceTimes;
-	NSArray * flickrImageUrls;
 
 
 	NSTimer * feedUpdateTimer;
@@ -62,6 +57,8 @@
 @property (nonatomic, strong) NSString * flickrFeedUrl;
 
 
+- (void)loadLogoWithCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))error;
+
 - (void)loadAnnouncementsWithCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))error;
 
 - (void)loadFlickrFeedWithCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))errorBlock;
@@ -77,6 +74,7 @@
 @property (nonatomic, strong) NSString * currentBackgroundPath;
 @property (nonatomic, strong) NSString * currentTitle;
 @property (nonatomic, strong) NSString * currentBody;
+@property (nonatomic, assign) BOOL showLogo;
 
 @property (nonatomic, strong) NSArray * announcements;
 

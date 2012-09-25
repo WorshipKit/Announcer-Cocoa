@@ -31,6 +31,7 @@
 	PCOControlResponseWindow * announcementsWindow;
 	
 	QTMovieLayer * backgroundLayer;
+	QTMovieLayer * logoLayer;
 	
 	CATextLayer * titleLayer;
 	CATextLayer * bodyLayer;

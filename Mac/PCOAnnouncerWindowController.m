@@ -367,6 +367,8 @@
 
 	[backgroundLayer removeFromSuperlayer];
 
+	[logoLayer removeFromSuperlayer];
+
 
 	NSError * loadErr = nil;
 
@@ -412,7 +414,38 @@
 	[backgroundLayer addSublayer:bodyLayer];
 
 	[NSCursor setHiddenUntilMouseMoves:YES];
-	
+
+
+	if (announcerController.showLogo)
+	{
+		if (announcerController.logoUrl)
+		{
+			[announcerController loadLogoWithCompletionBlock:^{
+
+				NSError * loadErr = nil;
+
+				QTMovie * logoMovie = [QTMovie movieWithFile:announcerController.logoPath error:&loadErr];
+				logoLayer = [QTMovieLayer layerWithMovie:logoMovie];
+				logoLayer.contentsGravity = kCAGravityResizeAspectFill;
+				
+				if (loadErr)
+				{
+					NSLog(@"logo err: %@", [loadErr localizedDescription]);
+				}
+
+				logoLayer.frame = CGRectMake(backgroundLayer.frame.size.width - 350, 0, 300, 200);
+				
+				[backgroundLayer addSublayer:logoLayer];
+				
+
+			} andErrorBlock:^(NSError * error) {
+
+				
+
+			}];
+		}
+	}
+
 }
 
 - (void)updateFlickrImage;
@@ -441,6 +474,9 @@
 	bodyLayer = nil;
 
 	[backgroundLayer removeFromSuperlayer];
+
+	[logoLayer removeFromSuperlayer];
+	logoLayer = nil;
 
 
 	[announcerController showBigLogoWithCompletion:^{
@@ -511,6 +547,8 @@
 	backgroundLayer = nil;
 	titleLayer = nil;
 	bodyLayer = nil;
+
+	logoLayer = nil;
 	
 	
 	
