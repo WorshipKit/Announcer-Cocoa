@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1080</int>
-		<string key="IBDocument.SystemVersion">12A256</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2549</string>
-		<string key="IBDocument.AppKitVersion">1185</string>
-		<string key="IBDocument.HIToolboxVersion">622.00</string>
+		<string key="IBDocument.SystemVersion">12C60</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2840</string>
+		<string key="IBDocument.AppKitVersion">1187.34</string>
+		<string key="IBDocument.HIToolboxVersion">625.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">2549</string>
+			<string key="NS.object.0">2840</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>IBNSLayoutConstraint</string>
@@ -145,7 +145,7 @@
 							<string key="NSFrame">{{184, 70}, {198, 14}}</string>
 							<reference key="NSSuperview" ref="1029810147"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
+							<reference key="NSNextKeyView" ref="301672005"/>
 							<string key="NSReuseIdentifierKey">_NS:1505</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="411678072">
@@ -170,6 +170,7 @@
 							<string key="NSFrame">{{306, 22}, {117, 32}}</string>
 							<reference key="NSSuperview" ref="1029810147"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="30339197">
@@ -239,19 +240,19 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: values.churchId</string>
+						<string key="label">value: values.campusId</string>
 						<reference key="source" ref="362192387"/>
 						<reference key="destination" ref="43432067"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="362192387"/>
 							<reference key="NSDestination" ref="43432067"/>
-							<string key="NSLabel">value: values.churchId</string>
+							<string key="NSLabel">value: values.campusId</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">values.churchId</string>
+							<string key="NSKeyPath">values.campusId</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">450</int>
+					<int key="connectionID">452</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -699,7 +700,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">451</int>
+			<int key="maxID">452</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -716,25 +717,15 @@
 					<string key="superclassName">NSWindowController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="announcementsUrlChanged:">id</string>
-						<string key="flickrUrlChanged:">id</string>
 						<string key="startSlideshow:">id</string>
-						<string key="toggleFlickr:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="announcementsUrlChanged:">
 							<string key="name">announcementsUrlChanged:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="flickrUrlChanged:">
-							<string key="name">flickrUrlChanged:</string>
-							<string key="candidateClassName">id</string>
-						</object>
 						<object class="IBActionInfo" key="startSlideshow:">
 							<string key="name">startSlideshow:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="toggleFlickr:">
-							<string key="name">toggleFlickr:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 					</dictionary>
@@ -742,11 +733,6 @@
 						<string key="announcementsActivitySpinner">NSProgressIndicator</string>
 						<string key="announcementsFeedField">NSTextField</string>
 						<string key="announcementsStatusLabel">NSTextField</string>
-						<string key="flickrActivitySpinner">NSProgressIndicator</string>
-						<string key="flickrFeedField">NSTextField</string>
-						<string key="flickrSettingsBox">NSBox</string>
-						<string key="flickrStatusLabel">NSTextField</string>
-						<string key="flickrToggleSwitch">NSButton</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
 						<object class="IBToOneOutletInfo" key="announcementsActivitySpinner">
@@ -760,26 +746,6 @@
 						<object class="IBToOneOutletInfo" key="announcementsStatusLabel">
 							<string key="name">announcementsStatusLabel</string>
 							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="flickrActivitySpinner">
-							<string key="name">flickrActivitySpinner</string>
-							<string key="candidateClassName">NSProgressIndicator</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="flickrFeedField">
-							<string key="name">flickrFeedField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="flickrSettingsBox">
-							<string key="name">flickrSettingsBox</string>
-							<string key="candidateClassName">NSBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="flickrStatusLabel">
-							<string key="name">flickrStatusLabel</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="flickrToggleSwitch">
-							<string key="name">flickrToggleSwitch</string>
-							<string key="candidateClassName">NSButton</string>
 						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">

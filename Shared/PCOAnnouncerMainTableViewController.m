@@ -72,10 +72,10 @@
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
 	}
 	
-	NSString * feedUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"feedUrl"];
+	NSString * feedUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"campusFeedUrl"];
 	if (!feedUrl)
 	{
-		feedUrl = @"http://announcer.heroku.com/feeds/1.json";
+		feedUrl = @"http://announcer.heroku.com/feeds/2.json";
 	}
 	
 	cell.textLabel.text = @"Feed";

@@ -705,21 +705,23 @@
 		
 		NSDictionary *resultsDictionary = [jsonData objectFromJSONData];
 
-		if ([resultsDictionary objectForKey:@"organization"])
-		{
-			NSDictionary * org = [resultsDictionary objectForKey:@"organization"];
+		NSLog(@"result: %@", resultsDictionary);
 
-			if ([org objectForKey:@"default_seconds_per_slide"])
+		if ([resultsDictionary objectForKey:@"campus"])
+		{
+			NSDictionary * campus = [resultsDictionary objectForKey:@"campus"];
+
+			if ([campus objectForKey:@"default_seconds_per_slide"])
 			{
-				NSNumber * seconds = [org objectForKey:@"default_seconds_per_slide"];
+				NSNumber * seconds = [campus objectForKey:@"default_seconds_per_slide"];
 				NSLog(@"seconds per picture: %d", [seconds intValue]);
 
 				[[NSUserDefaults standardUserDefaults] setObject:seconds forKey:@"seconds_per_picture"];
 			}
 
-			if ([org objectForKey:@"logo_file_url"])
+			if ([campus objectForKey:@"logo_file_url"])
 			{
-				NSString * newLogo = [org objectForKey:@"logo_file_url"];
+				NSString * newLogo = [campus objectForKey:@"logo_file_url"];
 
 				dispatch_async(dispatch_get_main_queue(), ^{
 
@@ -742,17 +744,17 @@
 				});
 			}
 
-			if ([org objectForKey:@"flickr_feed"])
+			if ([campus objectForKey:@"flickr_feed"])
 			{
-				NSString * flickrFeedUrl = [org objectForKey:@"flickr_feed"];
+				NSString * flickrFeedUrl = [campus objectForKey:@"flickr_feed"];
 				NSLog(@"flickr feed updated: %@", flickrFeedUrl);
 
 				[[NSUserDefaults standardUserDefaults] setObject:flickrFeedUrl forKey:@"flickr_feed_url"];
 			}
 
-			if ([org objectForKey:@"show_clock"])
+			if ([campus objectForKey:@"show_clock"])
 			{
-				NSNumber * showClock = [org objectForKey:@"show_clock"];
+				NSNumber * showClock = [campus objectForKey:@"show_clock"];
 				if ([showClock boolValue])
 				{
 					NSLog(@"clock enabled");
@@ -762,12 +764,13 @@
 					NSLog(@"clock disabled");
 				}
 
-				[[NSUserDefaults standardUserDefaults] setObject:showClock forKey:@"show_clock"];
+				if (showClock)
+					[[NSUserDefaults standardUserDefaults] setObject:showClock forKey:@"show_clock"];
 			}
 
-			if ([org objectForKey:@"show_flickr"])
+			if ([campus objectForKey:@"show_flickr"])
 			{
-				NSNumber * showFlickr = [org objectForKey:@"show_flickr"];
+				NSNumber * showFlickr = [campus objectForKey:@"show_flickr"];
 				if ([showFlickr boolValue])
 				{
 					NSLog(@"flickr enabled");
@@ -777,10 +780,11 @@
 					NSLog(@"flickr disabled");
 				}
 
-				[[NSUserDefaults standardUserDefaults] setObject:showFlickr forKey:@"show_flickr"];
+				if (showFlickr)
+					[[NSUserDefaults standardUserDefaults] setObject:showFlickr forKey:@"show_flickr"];
 			}
 		}
-
+		
 		if ([resultsDictionary objectForKey:@"service_times"])
 		{
 			NSArray * rawTimes = [resultsDictionary objectForKey:@"service_times"];
@@ -835,7 +839,7 @@
 
 			});
 		}
-
+		
 		if ([resultsDictionary objectForKey:@"announcements"])
 		{
 			NSArray * newAnnouncements = [resultsDictionary objectForKey:@"announcements"];

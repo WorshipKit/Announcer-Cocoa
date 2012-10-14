@@ -23,7 +23,7 @@
 		announcerController.delegate = self;
 		
 		NSMutableDictionary *appDefaults = [NSMutableDictionary dictionary];
-		[appDefaults setObject:@"1" forKey:@"churchId"];
+		[appDefaults setObject:@"2" forKey:@"campusId"];
 		[appDefaults setObject:@"http://api.flickr.com/services/feeds/photos_public.gne?id=20901156@N02&lang=en-us&format=rss_200" forKey:@"flickr_feed_url"];
 		[appDefaults setObject:[NSNumber numberWithFloat:10.0] forKey:@"seconds_per_picture"];
 		[appDefaults setObject:[NSNumber numberWithBool:NO] forKey:@"show_clock"];
