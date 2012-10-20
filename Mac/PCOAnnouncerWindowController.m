@@ -50,6 +50,13 @@
 	//[self flickrUrlChanged:self];
 	
 	//[self toggleFlickr:self];
+
+	if ([[NSUserDefaults standardUserDefaults] valueForKey:@"campusId"])
+	{
+		[self startSlideshow:nil];
+
+		[self nextSlide];
+	}
 }
 
 
@@ -91,7 +98,12 @@
 		[announcementsActivitySpinner stopAnimation:sender];
 		
 		announcementsStatusLabel.stringValue = [NSString stringWithFormat:@"Feed is ready. Found %ld announcements", [announcerController.announcements count]];
-		
+
+		if (announcementsWindow)
+		{
+			[self nextSlide];
+		}
+
 	} andErrorBlock:^(NSError * error) {
 		NSLog(@"error: %@", [error localizedDescription]);
 		
@@ -268,7 +280,7 @@
 		clockLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
 		clockLayer.font = (__bridge CFTypeRef)clockFont;
 		clockLayer.fontSize = clockSize;
-		clockLayer.alignmentMode = kCAAlignmentRight;
+		clockLayer.alignmentMode = kCAAlignmentCenter;
 		clockLayer.shadowOpacity = 1.0;
 		
 		clockLayer.frame = CGRectMake(20, 20, [[[announcementsWindow contentView] layer] bounds].size.width - 40, clockBoxSize.height);
@@ -370,20 +382,26 @@
 	[logoLayer removeFromSuperlayer];
 
 
-	NSError * loadErr = nil;
+	
 
-	QTMovie * backgroundMovie = [QTMovie movieWithFile:announcerController.currentBackgroundPath error:&loadErr];
-	backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
-	backgroundLayer.contentsGravity = kCAGravityResizeAspect;
-
-	if (loadErr)
+	if (announcerController.currentBackgroundPath)
 	{
-		NSLog(@"err: %@", [loadErr localizedDescription]);
+		NSError * loadErr = nil;
+
+		QTMovie * backgroundMovie = [QTMovie movieWithFile:announcerController.currentBackgroundPath error:&loadErr];
+		backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+		backgroundLayer.contentsGravity = kCAGravityResizeAspect;
+
+		if (loadErr)
+		{
+			NSLog(@"err: %@", [loadErr localizedDescription]);
+		}
+
+		backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
+
+		[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
 	}
-
-	backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
-
-	[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
+	
 
 
 	float titleFontSize = [self actualFontSizeForText:announcerController.currentTitle withFont:[NSFont fontWithName:@"Myriad Pro Bold" size:55] withOriginalSize:55];
@@ -499,7 +517,7 @@
 		[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
 
 	}];
-
+	
 	
 	[NSCursor setHiddenUntilMouseMoves:YES];
 

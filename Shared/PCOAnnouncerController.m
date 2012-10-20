@@ -21,8 +21,8 @@
 	{
 		//PCOAnnouncerMainTableViewController * mainTableController = [[PCOAnnouncerMainTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
 
-		currentSlideIndex = -1;
-		currentFlickrIndex = -1;
+		currentSlideIndex = 0;
+		currentFlickrIndex = 0;
 
 		_showLogo = YES;
 
@@ -42,6 +42,8 @@
 	[self loadAnnouncementsWithCompletionBlock:^{
 
 		NSLog(@"Loaded announcements in background.");
+
+		[self nextSlide];
 
 	} andErrorBlock:^(NSError * error) {
 
@@ -331,7 +333,7 @@
 
 
 
-	_showLogo = ![[[[self currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"show_logo"] boolValue];
+	_showLogo = [[[[self currentAnnouncements] objectAtIndex:slideIndex] objectForKey:@"show_logo"] boolValue];
 	if (_showLogo)
 	{
 		NSLog(@"showing logo");
@@ -433,12 +435,16 @@
 
 - (void)nextSlide;
 {
-	[self showNextSlideWithCompletion:^{
+	
+	if (![self shouldShowBigCountdown])
+	{
+		[self showNextSlideWithCompletion:^{
 
-		[self.delegate slideUpdated];
+			[self.delegate slideUpdated];
 
-	}];
-
+		}];
+	}
+	
 	if (!clockTimer)
 	{
 		clockTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateClock) userInfo:nil repeats:YES];
@@ -457,11 +463,11 @@
 
 - (void)allStop;
 {
-	[clockTimer invalidate], clockTimer = nil;
-	[slideTimer invalidate], slideTimer = nil;
-	[flickrTimer invalidate], flickrTimer = nil;
+	//[clockTimer invalidate], clockTimer = nil;
+	//[slideTimer invalidate], slideTimer = nil;
+	//[flickrTimer invalidate], flickrTimer = nil;
 
-	currentSlideIndex = -1;
+	currentSlideIndex = 0;
 }
 
 
@@ -662,6 +668,9 @@
 	}
 }
 
+
+
+
 - (void)loadAnnouncementsWithCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))errorBlock;
 {
 	dispatch_queue_t reqQueue = dispatch_queue_create("com.pco.announcer.requests", NULL);
@@ -732,8 +741,17 @@
 					[self downloadImageFromUrl:_logoUrl withCompletionBlock:^{
 
 						NSLog(@"downloaded logo image");
-
+						
 						self.logoPath = [self pathForImageFileAtUrl:self.logoUrl];
+
+						if (currentSlideIndex == -1 || [[self currentAnnouncements] count] == 0)
+						{
+							[self showBigLogoWithCompletion:^{
+
+								NSLog(@"showing big logo");
+
+							}];
+						}
 
 					} andErrorBlock:^(NSError * error) {
 
