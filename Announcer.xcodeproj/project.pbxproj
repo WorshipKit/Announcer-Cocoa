@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		58B999A8156A7E3B009BA4C8 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58B999A7156A7E3B009BA4C8 /* QuartzCore.framework */; };
+		58B9C0CA1634B880001D3A1E /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58B9C0C91634B880001D3A1E /* Sparkle.framework */; };
+		58B9C0CC1634B8D1001D3A1E /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 58B9C0C91634B880001D3A1E /* Sparkle.framework */; };
+		58B9C0CE1634BFBC001D3A1E /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 58B9C0CD1634BFBC001D3A1E /* dsa_pub.pem */; };
 		58D87AAE155ECEB2004027CD /* PCOAnnouncerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 58D87AAC155ECEB2004027CD /* PCOAnnouncerWindowController.m */; };
 		58D87AAF155ECEB2004027CD /* PCOAnnouncerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 58D87AAD155ECEB2004027CD /* PCOAnnouncerWindowController.xib */; };
 		58D87AB3155EDA28004027CD /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 58D87AB2155EDA28004027CD /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -71,8 +74,23 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		58B9C0CB1634B8BA001D3A1E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				58B9C0CC1634B8D1001D3A1E /* Sparkle.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		58B999A7156A7E3B009BA4C8 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
+		58B9C0C91634B880001D3A1E /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		58B9C0CD1634BFBC001D3A1E /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = SOURCE_ROOT; };
 		58D87AAB155ECEB2004027CD /* PCOAnnouncerWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PCOAnnouncerWindowController.h; path = Mac/PCOAnnouncerWindowController.h; sourceTree = SOURCE_ROOT; };
 		58D87AAC155ECEB2004027CD /* PCOAnnouncerWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PCOAnnouncerWindowController.m; path = Mac/PCOAnnouncerWindowController.m; sourceTree = SOURCE_ROOT; };
 		58D87AAD155ECEB2004027CD /* PCOAnnouncerWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = PCOAnnouncerWindowController.xib; path = Mac/PCOAnnouncerWindowController.xib; sourceTree = SOURCE_ROOT; };
@@ -154,6 +172,7 @@
 				58B999A8156A7E3B009BA4C8 /* QuartzCore.framework in Frameworks */,
 				58D87AE5155EEA0A004027CD /* libxml2.dylib in Frameworks */,
 				960A5BF515535E5800DB4EB9 /* Cocoa.framework in Frameworks */,
+				58B9C0CA1634B880001D3A1E /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,6 +232,7 @@
 		960A5BA415535BE300DB4EB9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				58B9C0C91634B880001D3A1E /* Sparkle.framework */,
 				96621B59156BFDAE00B9C7CC /* QTKit.framework */,
 				58D87AE4155EEA0A004027CD /* libxml2.dylib */,
 				58B999A7156A7E3B009BA4C8 /* QuartzCore.framework */,
@@ -297,6 +317,7 @@
 		960A5BFB15535E5800DB4EB9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				58B9C0CD1634BFBC001D3A1E /* dsa_pub.pem */,
 				960A5C5A1553615100DB4EB9 /* main.m */,
 				960A5C5B1553615100DB4EB9 /* MainMenu.xib */,
 				960A5C5D1553615100DB4EB9 /* InfoPlist.strings */,
@@ -404,6 +425,7 @@
 				960A5BEE15535E5800DB4EB9 /* Sources */,
 				960A5BEF15535E5800DB4EB9 /* Frameworks */,
 				960A5BF015535E5800DB4EB9 /* Resources */,
+				58B9C0CB1634B8BA001D3A1E /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -506,6 +528,7 @@
 				960A5C661553615100DB4EB9 /* Credits.rtf in Resources */,
 				960A5C671553615100DB4EB9 /* Announcer Mac-Info.plist in Resources */,
 				58D87AAF155ECEB2004027CD /* PCOAnnouncerWindowController.xib in Resources */,
+				58B9C0CE1634BFBC001D3A1E /* dsa_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -775,6 +798,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
+					"\"$(SRCROOT)\"",
 				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -798,6 +822,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
+					"\"$(SRCROOT)\"",
 				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
