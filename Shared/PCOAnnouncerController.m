@@ -167,6 +167,8 @@
 
 - (BOOL)shouldShowClock;
 {
+	return NO;
+
 	return [[[NSUserDefaults standardUserDefaults] valueForKey:@"show_clock"] boolValue];
 }
 
@@ -762,9 +764,9 @@
 				});
 			}
 
-			if ([campus objectForKey:@"flickr_feed"])
+			if ([campus objectForKey:@"photo_flickr_feed"])
 			{
-				NSString * flickrFeedUrl = [campus objectForKey:@"flickr_feed"];
+				NSString * flickrFeedUrl = [campus objectForKey:@"photo_flickr_feed"];
 				NSLog(@"flickr feed updated: %@", flickrFeedUrl);
 
 				[[NSUserDefaults standardUserDefaults] setObject:flickrFeedUrl forKey:@"flickr_feed_url"];
@@ -801,108 +803,179 @@
 				if (showFlickr)
 					[[NSUserDefaults standardUserDefaults] setObject:showFlickr forKey:@"show_flickr"];
 			}
-		}
-		
-		if ([resultsDictionary objectForKey:@"service_times"])
-		{
-			NSArray * rawTimes = [resultsDictionary objectForKey:@"service_times"];
 
-			NSMutableArray * parsedTimes = [NSMutableArray array];
-
-			NSLog(@"current day of week: %ld", [self dayOfWeek]);
-
-			for (NSDictionary * time in rawTimes)
+			if ([resultsDictionary objectForKey:@"service_times"])
 			{
-				int day = [[time valueForKey:@"day"] intValue];
-				int hour = [[time valueForKey:@"hour"] intValue];
-				int minute = [[time valueForKey:@"minute"] intValue];
+				NSArray * rawTimes = [resultsDictionary objectForKey:@"service_times"];
 
+				NSMutableArray * parsedTimes = [NSMutableArray array];
 
+				NSLog(@"current day of week: %ld", [self dayOfWeek]);
 
-				if (day == [self dayOfWeek] || day == [self tomorrowDayOfWeek])
+				for (NSDictionary * time in rawTimes)
 				{
-					unsigned unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
-					NSDate *date = [NSDate date];
-					if (day == [self tomorrowDayOfWeek])
+					int day = [[time valueForKey:@"day"] intValue];
+					int hour = [[time valueForKey:@"hour"] intValue];
+					int minute = [[time valueForKey:@"minute"] intValue];
+
+
+
+					if (day == [self dayOfWeek] || day == [self tomorrowDayOfWeek])
 					{
-						date = [date dateByAddingTimeInterval:18400];
+						unsigned unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
+						NSDate *date = [NSDate date];
+						if (day == [self tomorrowDayOfWeek])
+						{
+							date = [date dateByAddingTimeInterval:18400];
+						}
+						NSCalendar *calendar = [NSCalendar currentCalendar];
+						[calendar setTimeZone:[NSTimeZone localTimeZone]];
+						NSDateComponents *comps = [calendar components:unitFlags fromDate:date];
+
+						//update for the start date
+						[comps setHour:hour];
+						[comps setMinute:minute];
+						[comps setSecond:0];
+						NSDate *sDate = [calendar dateFromComponents:comps];
+
+						NSDateFormatter *df = [[NSDateFormatter alloc] init];
+						//[df setDateFormat:@"yyyy/MM/dd hh:mm:ss Z"];
+						[df setDateStyle:NSDateFormatterLongStyle];
+						[df setTimeStyle:NSDateFormatterLongStyle];
+						[df setTimeZone:[NSTimeZone localTimeZone]];
+
+						NSLog(@"adding date: %@", [df stringFromDate:sDate]);
+
+						[parsedTimes addObject:sDate];
 					}
-					NSCalendar *calendar = [NSCalendar currentCalendar];
-					[calendar setTimeZone:[NSTimeZone localTimeZone]];
-					NSDateComponents *comps = [calendar components:unitFlags fromDate:date];
-					
-					//update for the start date
-					[comps setHour:hour];
-					[comps setMinute:minute];
-					[comps setSecond:0];
-					NSDate *sDate = [calendar dateFromComponents:comps];
-
-					NSDateFormatter *df = [[NSDateFormatter alloc] init];
-					//[df setDateFormat:@"yyyy/MM/dd hh:mm:ss Z"];
-					[df setDateStyle:NSDateFormatterLongStyle];
-					[df setTimeStyle:NSDateFormatterLongStyle];
-					[df setTimeZone:[NSTimeZone localTimeZone]];
-
-					NSLog(@"adding date: %@", [df stringFromDate:sDate]);
-
-					[parsedTimes addObject:sDate];
 				}
+
+				dispatch_async(dispatch_get_main_queue(), ^{
+
+					NSLog(@"times: %@", parsedTimes);
+
+					self.serviceTimes = parsedTimes;
+
+				});
 			}
 
-			dispatch_async(dispatch_get_main_queue(), ^{
+			NSMutableArray * updatedAnnouncements = [NSMutableArray array];
 
-				NSLog(@"times: %@", parsedTimes);
-
-				self.serviceTimes = parsedTimes;
-
-			});
-		}
-		
-		if ([resultsDictionary objectForKey:@"announcements"])
-		{
-			NSArray * newAnnouncements = [resultsDictionary objectForKey:@"announcements"];
-			
-			for (NSDictionary * ann in newAnnouncements)
+			if ([campus objectForKey:@"announcements_flickr_feed"])
 			{
-				if ([ann objectForKey:@"background_file_url"] && ![[ann objectForKey:@"background_file_url"] isEqual:[NSNull null]])
+				NSString * feedUrl = [campus objectForKey:@"announcements_flickr_feed"];
+				NSLog(@"loading announcements flickr: %@", feedUrl);
+
+				NSError * err = nil;
+
+				NSURLResponse * response = nil;
+				NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL URLWithString:feedUrl]];
+
+				NSData* jsonData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
+
+				if (err)
 				{
-					[self downloadImageFromUrl:[ann objectForKey:@"background_file_url"] withCompletionBlock:^{
-						
-						NSLog(@"downloaded image");
-						
-					} andErrorBlock:^(NSError * error) {
-						
-						NSLog(@"error downloading image: %@", [err localizedDescription]);
-						
-					}];
+					dispatch_async(dispatch_get_main_queue(), ^{
+
+						errorBlock(err);
+
+						dispatch_release(reqQueue); //this executes on main thread
+
+					});
+
+					return;
 				}
+
+				if (!jsonData)
+				{
+					dispatch_async(dispatch_get_main_queue(), ^{
+
+						errorBlock([NSError errorWithDomain:@"Invalid data" code:0 userInfo:nil]);
+
+						dispatch_release(reqQueue); //this executes on main thread
+
+					});
+
+					return;
+				}
+
+				NSString * jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+
+				RKXMLParserLibXML * parser = [[RKXMLParserLibXML alloc] init];
+
+				NSDictionary * flickrResults = [parser parseXML:jsonString];
+				
+
+				NSMutableArray * newImageUrls = [NSMutableArray array];
+
+				if ([[[flickrResults objectForKey:@"rss"] objectForKey:@"channel"] objectForKey:@"item"])
+				{
+					//NSLog(@"items: %@", NSStringFromClass([[[resultsDictionary objectForKey:@"rss"] objectForKey:@"channel"] objectForKey:@"item"]));
+
+					//NSLog(@"object count: %lu", [[[[resultsDictionary objectForKey:@"rss"] objectForKey:@"channel"] objectForKey:@"item"] count]);
+
+					for (NSDictionary * item in [[[flickrResults objectForKey:@"rss"] objectForKey:@"channel"] objectForKey:@"item"])
+					{
+
+						NSString * backgroundFileUrl = [[item objectForKey:@"content"] objectForKey:@"url"];
+
+						NSDictionary * newAnnouncement = @{@"title" : @"", @"show_logo" : @NO, @"background_file_url" : backgroundFileUrl};
+
+						[updatedAnnouncements addObject:newAnnouncement];
+
+						[self downloadImageFromUrl:[[item objectForKey:@"content"] objectForKey:@"url"] withCompletionBlock:^{
+							NSLog(@"image downloaded");
+						} andErrorBlock:^(NSError * error) {
+							NSLog(@"error loading image: %@", [error localizedDescription]);
+						}];
+					}
+
+					if ([newImageUrls count] > 0)
+					{
+						_flickrImageUrls = newImageUrls;
+					}
+
+
+				}
+
+			}
+
+			if ([campus objectForKey:@"announcements"])
+			{
+				NSMutableArray * newAnnouncements = [[resultsDictionary objectForKey:@"announcements"] mutableCopy];
+
+				for (NSDictionary * ann in newAnnouncements)
+				{
+					if ([ann objectForKey:@"background_file_url"] && ![[ann objectForKey:@"background_file_url"] isEqual:[NSNull null]])
+					{
+						[self downloadImageFromUrl:[ann objectForKey:@"background_file_url"] withCompletionBlock:^{
+
+							NSLog(@"downloaded image");
+
+						} andErrorBlock:^(NSError * error) {
+
+							NSLog(@"error downloading image: %@", [err localizedDescription]);
+							
+						}];
+					}
+				}
+				
+				[updatedAnnouncements addObjectsFromArray:newAnnouncements];
+				
 			}
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
-
-				self.announcements = newAnnouncements;
-
+				
+				self.announcements = updatedAnnouncements;
+				
 				completion();
 				
 				dispatch_release(reqQueue); //this executes on main thread
 				
 			});
-			
-			
-			return;
 		}
-		else
-		{
-			dispatch_async(dispatch_get_main_queue(), ^{
-				
-				errorBlock([NSError errorWithDomain:@"No announcements" code:0 userInfo:nil]);
-				
-				dispatch_release(reqQueue); //this executes on main thread
-				
-			});
-			
-			return;
-		}
+		
+		
 		
 	});
 	
