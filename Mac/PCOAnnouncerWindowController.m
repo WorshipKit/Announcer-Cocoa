@@ -377,7 +377,7 @@
 	[bodyLayer removeFromSuperlayer];
 	bodyLayer = nil;
 
-	[backgroundLayer removeFromSuperlayer];
+	
 
 	[logoLayer removeFromSuperlayer];
 
@@ -389,7 +389,16 @@
 		NSError * loadErr = nil;
 
 		QTMovie * backgroundMovie = [QTMovie movieWithFile:announcerController.currentBackgroundPath error:&loadErr];
-		backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+
+		if (backgroundLayer)
+		{
+			[backgroundLayer setMovie:backgroundMovie];
+		}
+		else
+		{
+			backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+		}
+
 		backgroundLayer.contentsGravity = kCAGravityResizeAspect;
 
 		if (loadErr)
@@ -400,6 +409,10 @@
 		backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
 
 		[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
+	}
+	else
+	{
+		[backgroundLayer removeFromSuperlayer];
 	}
 	
 
