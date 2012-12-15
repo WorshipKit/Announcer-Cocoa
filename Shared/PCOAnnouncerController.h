@@ -51,10 +51,12 @@
 
 + (NSString *)localCacheDirectoryPath;
 
-
-
 @property (nonatomic, strong) NSString * announcementsFeedUrl;
 @property (nonatomic, strong) NSString * flickrFeedUrl;
+
+
+- (void)loadFeedAndUpdateImagesWithCompletionBlock:(void (^)(void))completion errorBlock:(void (^)(NSError * error))errorBlock;
+
 
 
 - (void)loadLogoWithCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))error;

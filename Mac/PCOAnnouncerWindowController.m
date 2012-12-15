@@ -8,6 +8,8 @@
 
 #import "PCOAnnouncerWindowController.h"
 
+#import "CAAnimationBlockDelegate.h"
+
 @interface PCOAnnouncerWindowController ()
 
 @end
@@ -55,7 +57,7 @@
 	{
 		[self startSlideshow:nil];
 
-		[self nextSlide];
+		//[self nextSlide];
 	}
 }
 
@@ -244,47 +246,53 @@
 		return;
 	}
 
-	NSLog(@"found %lu announcements to show.", [[announcerController currentAnnouncements] count]);
+	[announcementsActivitySpinner startAnimation:nil];
 
-	//NSRect frameRect = NSMakeRect(100, 100, 340, 280);
-	NSRect frameRect = [[NSScreen mainScreen] frame];
+	[announcerController loadFeedAndUpdateImagesWithCompletionBlock:^{
 
-	announcementsWindow = [[PCOControlResponseWindow alloc] initWithContentRect:frameRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:[NSScreen mainScreen]];
-	announcementsWindow.keyPressDelegate = self;
-	announcementsWindow.delegate = self;
-	[announcementsWindow setLevel:NSScreenSaverWindowLevel];
-	[announcementsWindow setBackgroundColor:[NSColor blackColor]];
+		[announcementsActivitySpinner stopAnimation:nil];
 
-	[announcementsWindow makeKeyAndOrderFront:self];
+		NSLog(@"found %lu announcements to show.", [[announcerController currentAnnouncements] count]);
 
-	[NSCursor setHiddenUntilMouseMoves:YES];
+		//NSRect frameRect = NSMakeRect(100, 100, 340, 280);
+		NSRect frameRect = [[NSScreen mainScreen] frame];
 
-	[[announcementsWindow contentView] setWantsLayer:YES];
-	
-	
-	//if ([announcerController shouldShowClock] == YES)
-	//{
+		announcementsWindow = [[PCOControlResponseWindow alloc] initWithContentRect:frameRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:[NSScreen mainScreen]];
+		announcementsWindow.keyPressDelegate = self;
+		announcementsWindow.delegate = self;
+		[announcementsWindow setLevel:NSScreenSaverWindowLevel];
+		[announcementsWindow setBackgroundColor:[NSColor blackColor]];
+
+		[announcementsWindow makeKeyAndOrderFront:self];
+
+		[NSCursor setHiddenUntilMouseMoves:YES];
+
+		[[announcementsWindow contentView] setWantsLayer:YES];
+
+
+		//if ([announcerController shouldShowClock] == YES)
+		//{
 		clockLayer = [CATextLayer layer];
-		
+
 		clockLayer.frame = [[[announcementsWindow contentView] layer] bounds];
-		
+
 		clockLayer.string = [announcerController currentClockString];
-		
+
 		float clockSize = 35;
 		NSFont * clockFont = [NSFont fontWithName:@"Myriad Pro Bold" size:clockSize];
 		clockSize = [self actualFontSizeForText:clockLayer.string withFont:clockFont withOriginalSize:clockSize];
 		clockFont = [NSFont fontWithName:clockFont.fontName size:clockSize];
-		
+
 		NSSize clockBoxSize = [clockLayer.string sizeWithAttributes:[NSDictionary dictionaryWithObject:clockFont forKey:NSFontAttributeName]];
-		
+
 		clockLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
 		clockLayer.font = (__bridge CFTypeRef)clockFont;
 		clockLayer.fontSize = clockSize;
 		clockLayer.alignmentMode = kCAAlignmentCenter;
 		clockLayer.shadowOpacity = 1.0;
-		
+
 		clockLayer.frame = CGRectMake(20, 20, [[[announcementsWindow contentView] layer] bounds].size.width - 40, clockBoxSize.height);
-		
+
 		[[[announcementsWindow contentView] layer] addSublayer:clockLayer];
 
 
@@ -312,34 +320,44 @@
 		[[[announcementsWindow contentView] layer] addSublayer:bigClockLayer];
 
 		bigClockLayer.hidden = YES;
-		
-	//}
+
+		//}
+
+		if ([announcerController shouldShowFlickr] == YES && [[NSScreen screens] count] > 1)
+		{
+			flickrWindow = [[PCOControlResponseWindow alloc] initWithContentRect:[[[NSScreen screens] objectAtIndex:1] frame] styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
+			flickrWindow.keyPressDelegate = self;
+			flickrWindow.delegate = self;
+			[flickrWindow setLevel:NSScreenSaverWindowLevel];
+			[flickrWindow setBackgroundColor:[NSColor blackColor]];
+
+			[flickrWindow makeKeyAndOrderFront:self];
+
+			[[flickrWindow contentView] setWantsLayer:YES];
+
+			[self nextPicture];
+		}
+
+
+
+		if ([[announcerController announcements] count] > 0)
+		{
+			[self nextSlide];
+		}
+		else
+		{
+			[self showBigLogo];
+		}
+
+	} errorBlock:^(NSError * error) {
+
+		[announcementsActivitySpinner stopAnimation:nil];
+
+		NSAlert * errAlert = [NSAlert alertWithError:error];
+		[errAlert runModal];
+
+	}];
 	
-	if ([announcerController shouldShowFlickr] == YES && [[NSScreen screens] count] > 1)
-	{
-		flickrWindow = [[PCOControlResponseWindow alloc] initWithContentRect:[[[NSScreen screens] objectAtIndex:1] frame] styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
-		flickrWindow.keyPressDelegate = self;
-		flickrWindow.delegate = self;
-		[flickrWindow setLevel:NSScreenSaverWindowLevel];
-		[flickrWindow setBackgroundColor:[NSColor blackColor]];
-		
-		[flickrWindow makeKeyAndOrderFront:self];
-		
-		[[flickrWindow contentView] setWantsLayer:YES];
-		
-		[self nextPicture];
-	}
-	
-	
-	
-	if ([[announcerController announcements] count] > 0)
-	{
-		[self nextSlide];
-	}
-	else
-	{
-		[self showBigLogo];
-	}
 }
 
 - (void)updateClock;
@@ -348,7 +366,11 @@
 	{
 		titleLayer.hidden = YES;
 		bodyLayer.hidden = YES;
-		backgroundLayer.hidden = YES;
+
+		activeBackgroundLayer.hidden = YES;
+		backgroundLayer1.hidden = YES;
+		backgroundLayer2.hidden = YES;
+
 		clockLayer.hidden = YES;
 
 		bigClockLayer.hidden = NO;
@@ -357,7 +379,7 @@
 	{
 		titleLayer.hidden = NO;
 		bodyLayer.hidden = NO;
-		backgroundLayer.hidden = NO;
+		activeBackgroundLayer.hidden = NO;
 		clockLayer.hidden = NO;
 
 		bigClockLayer.hidden = YES;
@@ -377,44 +399,143 @@
 	[bodyLayer removeFromSuperlayer];
 	bodyLayer = nil;
 
-	
-
 	[logoLayer removeFromSuperlayer];
 
+	__block CALayer * layerToFadeOut = activeBackgroundLayer;
+	__block CALayer * layerToFadeIn = nil;
 
 	
-
 	if (announcerController.currentBackgroundPath)
 	{
 		NSError * loadErr = nil;
 
 		QTMovie * backgroundMovie = [QTMovie movieWithFile:announcerController.currentBackgroundPath error:&loadErr];
 
-		if (backgroundLayer)
-		{
-			[backgroundLayer setMovie:backgroundMovie];
-		}
-		else
-		{
-			backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
-		}
-
-		backgroundLayer.contentsGravity = kCAGravityResizeAspect;
+		QTMovieLayer * newBackgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+		newBackgroundLayer.contentsGravity = kCAGravityResizeAspect;
 
 		if (loadErr)
 		{
 			NSLog(@"err: %@", [loadErr localizedDescription]);
 		}
 
-		backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
+		newBackgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
 
-		[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
+		[[[announcementsWindow contentView] layer] insertSublayer:newBackgroundLayer below:clockLayer];
+
+		layerToFadeOut = activeBackgroundLayer;
+
+		if (activeBackgroundLayer == backgroundLayer1)
+		{
+			backgroundLayer2 = newBackgroundLayer;
+		}
+		else if (activeBackgroundLayer == backgroundLayer2)
+		{
+			backgroundLayer1 = newBackgroundLayer;
+		}
+
+		layerToFadeIn = newBackgroundLayer;
+		activeBackgroundLayer = newBackgroundLayer;
+
+		CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+		animation.duration = 0.5;
+		animation.repeatCount = 0;
+		animation.fromValue = [NSNumber numberWithFloat:0];
+		animation.toValue = [NSNumber numberWithFloat:1.0];
+
+		CAAnimationBlockDelegate *delegate =
+		[[CAAnimationBlockDelegate alloc] init];
+		// Define block that gets invoked after
+		// animation starts
+		delegate.blockOnAnimationStarted = ^() {
+			
+		};
+		// Define block that gets invoked after
+		// animation succeeds
+		delegate.blockOnAnimationSucceeded = ^() {
+
+			CABasicAnimation * fadeOutAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+			fadeOutAnimation.duration = 0.5;
+			fadeOutAnimation.repeatCount = 0;
+			fadeOutAnimation.fromValue = [NSNumber numberWithFloat:1.0];
+			fadeOutAnimation.toValue = [NSNumber numberWithFloat:0];
+
+			CAAnimationBlockDelegate *delegate =
+			[[CAAnimationBlockDelegate alloc] init];
+			// Define block that gets invoked after
+			// animation starts
+			delegate.blockOnAnimationStarted = ^() {
+				// your logic goes here ...
+			};
+			// Define block that gets invoked after
+			// animation succeeds
+			delegate.blockOnAnimationSucceeded = ^() {
+				if (layerToFadeOut == backgroundLayer1)
+				{
+					backgroundLayer1 = nil;
+				}
+				else if (layerToFadeOut == backgroundLayer2)
+				{
+					backgroundLayer2 = nil;
+				}
+
+				[layerToFadeOut removeFromSuperlayer];
+				layerToFadeOut = nil;
+
+				activeBackgroundLayer = nil;
+			};
+			fadeOutAnimation.delegate = delegate;
+
+			[layerToFadeOut addAnimation:fadeOutAnimation forKey:@"fadeOut"];
+			
+			activeBackgroundLayer = nil;
+
+		};
+		animation.delegate = delegate;
+
+		[layerToFadeIn addAnimation:animation forKey:@"fadeOut"];
+
+		activeBackgroundLayer = nil;
 	}
 	else
 	{
-		[backgroundLayer removeFromSuperlayer];
+		CABasicAnimation * fadeOutAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+		fadeOutAnimation.duration = 0.5;
+		fadeOutAnimation.repeatCount = 0;
+		fadeOutAnimation.fromValue = [NSNumber numberWithFloat:1.0];
+		fadeOutAnimation.toValue = [NSNumber numberWithFloat:0];
+
+		CAAnimationBlockDelegate *delegate =
+		[[CAAnimationBlockDelegate alloc] init];
+		// Define block that gets invoked after
+		// animation starts
+		delegate.blockOnAnimationStarted = ^() {
+			// your logic goes here ...
+		};
+		// Define block that gets invoked after
+		// animation succeeds
+		delegate.blockOnAnimationSucceeded = ^() {
+			if (layerToFadeOut == backgroundLayer1)
+			{
+				backgroundLayer1 = nil;
+			}
+			else if (layerToFadeOut == backgroundLayer2)
+			{
+				backgroundLayer2 = nil;
+			}
+
+			[layerToFadeOut removeFromSuperlayer];
+			layerToFadeOut = nil;
+
+			activeBackgroundLayer = nil;
+		};
+		fadeOutAnimation.delegate = delegate;
+
+		[layerToFadeOut addAnimation:fadeOutAnimation forKey:@"fadeOut"];
+
+		activeBackgroundLayer = nil;
 	}
-	
+
 
 
 	float titleFontSize = [self actualFontSizeForText:announcerController.currentTitle withFont:[NSFont fontWithName:@"Myriad Pro Bold" size:55] withOriginalSize:55];
@@ -423,26 +544,26 @@
 	NSSize titleBoxSize = [announcerController.currentTitle sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
 
 	titleLayer = [CATextLayer layer];
-	titleLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.size.height - titleBoxSize.height - 10, backgroundLayer.bounds.size.width, titleBoxSize.height);
+	titleLayer.frame = CGRectMake(activeBackgroundLayer.bounds.origin.x, activeBackgroundLayer.bounds.size.height - titleBoxSize.height - 10, activeBackgroundLayer.bounds.size.width, titleBoxSize.height);
 	titleLayer.string = announcerController.currentTitle;
 	titleLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
 	titleLayer.font = (__bridge CFTypeRef)titleFont;
 	titleLayer.fontSize = titleFontSize;
 	titleLayer.alignmentMode = kCAAlignmentCenter;
-	[backgroundLayer addSublayer:titleLayer];
+	[activeBackgroundLayer addSublayer:titleLayer];
 
 
 	float bodyFontSize = [self actualFontSizeForText:announcerController.currentBody withFont:[NSFont fontWithName:@"Myriad Pro" size:45] withOriginalSize:45];
 	NSFont * bodyFont = [NSFont fontWithName:@"Myriad Pro" size:bodyFontSize];
 
 	bodyLayer = [CATextLayer layer];
-	bodyLayer.frame = CGRectMake(backgroundLayer.bounds.origin.x, backgroundLayer.bounds.origin.y, backgroundLayer.bounds.size.width, backgroundLayer.bounds.size.height - titleBoxSize.height - 45);
+	bodyLayer.frame = CGRectMake(activeBackgroundLayer.bounds.origin.x, activeBackgroundLayer.bounds.origin.y, activeBackgroundLayer.bounds.size.width, activeBackgroundLayer.bounds.size.height - titleBoxSize.height - 45);
 	bodyLayer.string = announcerController.currentBody;
 	bodyLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1);
 	bodyLayer.font = (__bridge CFTypeRef)bodyFont;
 	bodyLayer.fontSize = bodyFontSize;
 	bodyLayer.alignmentMode = kCAAlignmentCenter;
-	[backgroundLayer addSublayer:bodyLayer];
+	[activeBackgroundLayer addSublayer:bodyLayer];
 
 	[NSCursor setHiddenUntilMouseMoves:YES];
 
@@ -464,9 +585,9 @@
 					NSLog(@"logo err: %@", [loadErr localizedDescription]);
 				}
 
-				logoLayer.frame = CGRectMake(backgroundLayer.frame.size.width - 350, 0, 300, 200);
+				logoLayer.frame = CGRectMake(activeBackgroundLayer.frame.size.width - 350, 0, 300, 200);
 				
-				[backgroundLayer addSublayer:logoLayer];
+				[activeBackgroundLayer addSublayer:logoLayer];
 				
 
 			} andErrorBlock:^(NSError * error) {
@@ -479,18 +600,143 @@
 
 }
 
+
 - (void)updateFlickrImage;
 {
-	[flickrLayer removeFromSuperlayer];
-	flickrLayer = nil;
+	__block CALayer * layerToFadeOut = activeBackgroundLayer;
+	__block CALayer * layerToFadeIn = nil;
+	
+	
+	if (announcerController.currentBackgroundPath)
+	{
+		NSError * loadErr = nil;
 
-	QTMovie * backgroundMovie = [QTMovie movieWithFile:announcerController.currentFlickrImagePath error:nil];
-	flickrLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
-	flickrLayer.contentsGravity = kCAGravityResizeAspect;
 
-	flickrLayer.frame = [[flickrWindow contentView] layer].bounds;
+		QTMovie * backgroundMovie = [QTMovie movieWithFile:announcerController.currentFlickrImagePath error:&loadErr];
+		QTMovieLayer * newFlickrLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+		newFlickrLayer.contentsGravity = kCAGravityResizeAspect;
 
-	[[[flickrWindow contentView] layer] addSublayer:flickrLayer];
+		newFlickrLayer.frame = [[flickrWindow contentView] layer].bounds;
+
+		[[[flickrWindow contentView] layer] addSublayer:newFlickrLayer];
+		
+
+		layerToFadeOut = activeFlickrLayer;
+
+		if (activeBackgroundLayer == backgroundLayer1)
+		{
+			backgroundLayer2 = newFlickrLayer;
+		}
+		else if (activeBackgroundLayer == backgroundLayer2)
+		{
+			backgroundLayer1 = newFlickrLayer;
+		}
+
+		layerToFadeIn = newFlickrLayer;
+		activeFlickrLayer = newFlickrLayer;
+
+		CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+		animation.duration = 0.5;
+		animation.repeatCount = 0;
+		animation.fromValue = [NSNumber numberWithFloat:0];
+		animation.toValue = [NSNumber numberWithFloat:1.0];
+
+		CAAnimationBlockDelegate *delegate =
+		[[CAAnimationBlockDelegate alloc] init];
+		// Define block that gets invoked after
+		// animation starts
+		delegate.blockOnAnimationStarted = ^() {
+
+		};
+		// Define block that gets invoked after
+		// animation succeeds
+		delegate.blockOnAnimationSucceeded = ^() {
+
+			CABasicAnimation * fadeOutAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+			fadeOutAnimation.duration = 0.5;
+			fadeOutAnimation.repeatCount = 0;
+			fadeOutAnimation.fromValue = [NSNumber numberWithFloat:1.0];
+			fadeOutAnimation.toValue = [NSNumber numberWithFloat:0];
+
+			CAAnimationBlockDelegate *delegate =
+			[[CAAnimationBlockDelegate alloc] init];
+			// Define block that gets invoked after
+			// animation starts
+			delegate.blockOnAnimationStarted = ^() {
+				// your logic goes here ...
+			};
+			// Define block that gets invoked after
+			// animation succeeds
+			delegate.blockOnAnimationSucceeded = ^() {
+				if (layerToFadeOut == backgroundLayer1)
+				{
+					flickrLayer1 = nil;
+				}
+				else if (layerToFadeOut == backgroundLayer2)
+				{
+					flickrLayer2 = nil;
+				}
+
+				[layerToFadeOut removeFromSuperlayer];
+				layerToFadeOut = nil;
+
+				activeBackgroundLayer = nil;
+			};
+			fadeOutAnimation.delegate = delegate;
+
+			[layerToFadeOut addAnimation:fadeOutAnimation forKey:@"fadeOut"];
+
+			activeBackgroundLayer = nil;
+
+		};
+		animation.delegate = delegate;
+
+		[layerToFadeIn addAnimation:animation forKey:@"fadeOut"];
+
+		activeBackgroundLayer = nil;
+	}
+	else
+	{
+		CABasicAnimation * fadeOutAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+		fadeOutAnimation.duration = 0.5;
+		fadeOutAnimation.repeatCount = 0;
+		fadeOutAnimation.fromValue = [NSNumber numberWithFloat:1.0];
+		fadeOutAnimation.toValue = [NSNumber numberWithFloat:0];
+
+		CAAnimationBlockDelegate *delegate =
+		[[CAAnimationBlockDelegate alloc] init];
+		// Define block that gets invoked after
+		// animation starts
+		delegate.blockOnAnimationStarted = ^() {
+			// your logic goes here ...
+		};
+		// Define block that gets invoked after
+		// animation succeeds
+		delegate.blockOnAnimationSucceeded = ^() {
+			if (layerToFadeOut == flickrLayer1)
+			{
+				flickrLayer1 = nil;
+			}
+			else if (layerToFadeOut == flickrLayer2)
+			{
+				flickrLayer2 = nil;
+			}
+
+			[layerToFadeOut removeFromSuperlayer];
+			layerToFadeOut = nil;
+
+			activeFlickrLayer = nil;
+		};
+		fadeOutAnimation.delegate = delegate;
+
+		[layerToFadeOut addAnimation:fadeOutAnimation forKey:@"fadeOut"];
+		
+		activeFlickrLayer = nil;
+	}
+
+
+
+	
 }
 
 
@@ -504,7 +750,12 @@
 	[bodyLayer removeFromSuperlayer];
 	bodyLayer = nil;
 
-	[backgroundLayer removeFromSuperlayer];
+	[activeBackgroundLayer removeFromSuperlayer];
+	[backgroundLayer1 removeFromSuperlayer];
+	[backgroundLayer2 removeFromSuperlayer];
+	activeBackgroundLayer = nil;
+	backgroundLayer1 = nil;
+	backgroundLayer2 = nil;
 
 	[logoLayer removeFromSuperlayer];
 	logoLayer = nil;
@@ -517,17 +768,17 @@
 		NSString * backgroundPath = announcerController.logoPath;
 
 		QTMovie * backgroundMovie = [QTMovie movieWithFile:backgroundPath error:&loadErr];
-		backgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
-		backgroundLayer.contentsGravity = kCAGravityResizeAspect;
+		activeBackgroundLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+		activeBackgroundLayer.contentsGravity = kCAGravityResizeAspect;
 		
 		if (loadErr)
 		{
 			NSLog(@"err: %@", [loadErr localizedDescription]);
 		}
 
-		backgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
+		activeBackgroundLayer.frame = [[announcementsWindow contentView] layer].bounds;
 
-		[[[announcementsWindow contentView] layer] insertSublayer:backgroundLayer below:clockLayer];
+		[[[announcementsWindow contentView] layer] insertSublayer:activeBackgroundLayer below:clockLayer];
 
 	}];
 	
@@ -575,7 +826,10 @@
 	[announcementsWindow orderOut:sender];
 	announcementsWindow = nil;
 	
-	backgroundLayer = nil;
+	activeBackgroundLayer = nil;
+	backgroundLayer1 = nil;
+	backgroundLayer2 = nil;
+
 	titleLayer = nil;
 	bodyLayer = nil;
 
@@ -583,7 +837,12 @@
 	
 	
 	
-	[flickrLayer removeFromSuperlayer];
+	[activeFlickrLayer removeFromSuperlayer];
+	activeFlickrLayer = nil;
+	[flickrLayer1 removeFromSuperlayer];
+	flickrLayer1 = nil;
+	[flickrLayer2 removeFromSuperlayer];
+	flickrLayer2 = nil;
 	
 	[flickrWindow orderOut:sender];
 	flickrWindow = nil;

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		58391F5B167CEBD0009DB7CE /* CAAnimationBlockDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 58391F5A167CEBD0009DB7CE /* CAAnimationBlockDelegate.m */; };
+		58391F5C167CEBD0009DB7CE /* CAAnimationBlockDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 58391F5A167CEBD0009DB7CE /* CAAnimationBlockDelegate.m */; };
+		58391F5D167CEBD0009DB7CE /* CAAnimationBlockDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 58391F5A167CEBD0009DB7CE /* CAAnimationBlockDelegate.m */; };
+		58391F5E167CEBD0009DB7CE /* CAAnimationBlockDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 58391F5A167CEBD0009DB7CE /* CAAnimationBlockDelegate.m */; };
 		58B999A8156A7E3B009BA4C8 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58B999A7156A7E3B009BA4C8 /* QuartzCore.framework */; };
 		58B9C0CA1634B880001D3A1E /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58B9C0C91634B880001D3A1E /* Sparkle.framework */; };
 		58B9C0CC1634B8D1001D3A1E /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 58B9C0C91634B880001D3A1E /* Sparkle.framework */; };
@@ -28,21 +32,17 @@
 		960A5C1215535E5800DB4EB9 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960A5BD715535BE300DB4EB9 /* SenTestingKit.framework */; };
 		960A5C1315535E5800DB4EB9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960A5BF415535E5800DB4EB9 /* Cocoa.framework */; };
 		960A5C351553607B00DB4EB9 /* AnnouncerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5C341553607B00DB4EB9 /* AnnouncerTests.m */; };
-		960A5C391553608900DB4EB9 /* AnnouncerTests-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C361553608900DB4EB9 /* AnnouncerTests-Info.plist */; };
 		960A5C3A1553608900DB4EB9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C371553608900DB4EB9 /* InfoPlist.strings */; };
 		960A5C3D155360AF00DB4EB9 /* Announcer_MacTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5C3C155360AF00DB4EB9 /* Announcer_MacTests.m */; };
-		960A5C41155360BA00DB4EB9 /* Announcer MacTests-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C3E155360BA00DB4EB9 /* Announcer MacTests-Info.plist */; };
 		960A5C42155360BA00DB4EB9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C3F155360BA00DB4EB9 /* InfoPlist.strings */; };
 		960A5C4E1553611100DB4EB9 /* PCOAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5C4C1553611100DB4EB9 /* PCOAppDelegate.m */; };
 		960A5C541553612800DB4EB9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5C4F1553612800DB4EB9 /* main.m */; };
 		960A5C551553612800DB4EB9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C501553612800DB4EB9 /* InfoPlist.strings */; };
-		960A5C561553612800DB4EB9 /* Announcer iOS-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C531553612800DB4EB9 /* Announcer iOS-Info.plist */; };
 		960A5C591553613E00DB4EB9 /* PCOAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5C571553613E00DB4EB9 /* PCOAppDelegate.m */; };
 		960A5C631553615100DB4EB9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5C5A1553615100DB4EB9 /* main.m */; };
 		960A5C641553615100DB4EB9 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C5B1553615100DB4EB9 /* MainMenu.xib */; };
 		960A5C651553615100DB4EB9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C5D1553615100DB4EB9 /* InfoPlist.strings */; };
 		960A5C661553615100DB4EB9 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C5F1553615100DB4EB9 /* Credits.rtf */; };
-		960A5C671553615100DB4EB9 /* Announcer Mac-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C621553615100DB4EB9 /* Announcer Mac-Info.plist */; };
 		960A5CA515536A2F00DB4EB9 /* PCOAnnouncerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5CA415536A2E00DB4EB9 /* PCOAnnouncerController.m */; };
 		960A5CA615536A2F00DB4EB9 /* PCOAnnouncerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5CA415536A2E00DB4EB9 /* PCOAnnouncerController.m */; };
 		960A5CC315536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5CC215536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m */; };
@@ -88,6 +88,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		58391F59167CEBCF009DB7CE /* CAAnimationBlockDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAAnimationBlockDelegate.h; sourceTree = "<group>"; };
+		58391F5A167CEBD0009DB7CE /* CAAnimationBlockDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CAAnimationBlockDelegate.m; sourceTree = "<group>"; };
 		58B999A7156A7E3B009BA4C8 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		58B9C0C91634B880001D3A1E /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		58B9C0CD1634BFBC001D3A1E /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = SOURCE_ROOT; };
@@ -358,6 +360,8 @@
 				960A5CA415536A2E00DB4EB9 /* PCOAnnouncerController.m */,
 				960A5CC115536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.h */,
 				960A5CC215536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m */,
+				58391F59167CEBCF009DB7CE /* CAAnimationBlockDelegate.h */,
+				58391F5A167CEBD0009DB7CE /* CAAnimationBlockDelegate.m */,
 			);
 			name = Shared;
 			sourceTree = "<group>";
@@ -462,7 +466,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = PCO;
-				LastUpgradeCheck = 0430;
+				LastUpgradeCheck = 0450;
 			};
 			buildConfigurationList = 960A5B9B15535BE300DB4EB9 /* Build configuration list for PBXProject "Announcer" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -506,7 +510,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				960A5C551553612800DB4EB9 /* InfoPlist.strings in Resources */,
-				960A5C561553612800DB4EB9 /* Announcer iOS-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -514,7 +517,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				960A5C391553608900DB4EB9 /* AnnouncerTests-Info.plist in Resources */,
 				960A5C3A1553608900DB4EB9 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -526,7 +528,6 @@
 				960A5C641553615100DB4EB9 /* MainMenu.xib in Resources */,
 				960A5C651553615100DB4EB9 /* InfoPlist.strings in Resources */,
 				960A5C661553615100DB4EB9 /* Credits.rtf in Resources */,
-				960A5C671553615100DB4EB9 /* Announcer Mac-Info.plist in Resources */,
 				58D87AAF155ECEB2004027CD /* PCOAnnouncerWindowController.xib in Resources */,
 				58B9C0CE1634BFBC001D3A1E /* dsa_pub.pem in Resources */,
 			);
@@ -536,7 +537,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				960A5C41155360BA00DB4EB9 /* Announcer MacTests-Info.plist in Resources */,
 				960A5C42155360BA00DB4EB9 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -583,6 +583,7 @@
 				960A5CC315536F7C00DB4EB9 /* PCOAnnouncerMainTableViewController.m in Sources */,
 				58D87AB3155EDA28004027CD /* JSONKit.m in Sources */,
 				58D87ACC155EE92E004027CD /* RKXMLParserLibXML.m in Sources */,
+				58391F5B167CEBD0009DB7CE /* CAAnimationBlockDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -591,6 +592,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				960A5C351553607B00DB4EB9 /* AnnouncerTests.m in Sources */,
+				58391F5C167CEBD0009DB7CE /* CAAnimationBlockDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -605,6 +607,7 @@
 				58D87AB4155EDA28004027CD /* JSONKit.m in Sources */,
 				58D87ACD155EE92E004027CD /* RKXMLParserLibXML.m in Sources */,
 				96621B58156BD62400B9C7CC /* PCOControlResponseWindow.m in Sources */,
+				58391F5D167CEBD0009DB7CE /* CAAnimationBlockDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -613,6 +616,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				960A5C3D155360AF00DB4EB9 /* Announcer_MacTests.m in Sources */,
+				58391F5E167CEBD0009DB7CE /* CAAnimationBlockDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -795,6 +799,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
@@ -818,6 +823,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -841,6 +847,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Announcer Mac.app/Contents/MacOS/Announcer Mac";
+				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -861,6 +868,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Announcer Mac.app/Contents/MacOS/Announcer Mac";
+				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;

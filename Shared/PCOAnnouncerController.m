@@ -63,6 +63,301 @@
 }
 
 
+- (void)loadFeedAndUpdateImagesWithCompletionBlock:(void (^)(void))completion errorBlock:(void (^)(NSError * error))errorBlock;
+{
+	dispatch_queue_t reqQueue = dispatch_queue_create("com.pco.announcer.requests", NULL);
+    dispatch_async(reqQueue, ^{
+
+		NSError * err = nil;
+
+		NSURLResponse * response = nil;
+		NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.announcementsFeedUrl]];
+
+		NSData* jsonData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
+
+		if (err)
+		{
+
+			dispatch_async(dispatch_get_main_queue(), ^{
+
+				errorBlock(err);
+
+				dispatch_release(reqQueue); //this executes on main thread
+
+			});
+
+
+			return;
+		}
+
+		if (!jsonData)
+		{
+
+			dispatch_async(dispatch_get_main_queue(), ^{
+
+				errorBlock([NSError errorWithDomain:@"Invalid data" code:0 userInfo:nil]);
+
+				dispatch_release(reqQueue); //this executes on main thread
+
+			});
+
+			return;
+		}
+
+		NSDictionary *resultsDictionary = [jsonData objectFromJSONData];
+
+		NSLog(@"result: %@", resultsDictionary);
+
+		if ([resultsDictionary objectForKey:@"campus"])
+		{
+			NSDictionary * campus = [resultsDictionary objectForKey:@"campus"];
+
+			if ([campus objectForKey:@"default_seconds_per_slide"])
+			{
+				NSNumber * seconds = [campus objectForKey:@"default_seconds_per_slide"];
+				NSLog(@"seconds per picture: %d", [seconds intValue]);
+
+				[[NSUserDefaults standardUserDefaults] setObject:seconds forKey:@"seconds_per_picture"];
+			}
+
+			if ([campus objectForKey:@"logo_file_url"])
+			{
+				NSString * newLogo = [campus objectForKey:@"logo_file_url"];
+
+				dispatch_async(dispatch_get_main_queue(), ^{
+
+					self.logoUrl = newLogo;
+
+					NSLog(@"loading logo from %@", _logoUrl);
+
+					[self downloadImageFromUrl:_logoUrl withCompletionBlock:^{
+
+						NSLog(@"downloaded logo image");
+
+						self.logoPath = [self pathForImageFileAtUrl:self.logoUrl];
+
+						if (currentSlideIndex == -1 || [[self currentAnnouncements] count] == 0)
+						{
+							[self showBigLogoWithCompletion:^{
+
+								NSLog(@"showing big logo");
+
+							}];
+						}
+
+					} andErrorBlock:^(NSError * error) {
+
+						NSLog(@"error loading image: %@", [error localizedDescription]);
+
+					}];
+
+				});
+			}
+
+			if ([campus objectForKey:@"photo_flickr_feed"])
+			{
+				NSString * flickrFeedUrl = [campus objectForKey:@"photo_flickr_feed"];
+				NSLog(@"flickr feed updated: %@", flickrFeedUrl);
+
+				[[NSUserDefaults standardUserDefaults] setObject:flickrFeedUrl forKey:@"flickr_feed_url"];
+			}
+
+			if ([campus objectForKey:@"show_clock"])
+			{
+				NSNumber * showClock = [campus objectForKey:@"show_clock"];
+				if ([showClock boolValue])
+				{
+					NSLog(@"clock enabled");
+				}
+				else
+				{
+					NSLog(@"clock disabled");
+				}
+
+				if (showClock)
+					[[NSUserDefaults standardUserDefaults] setObject:showClock forKey:@"show_clock"];
+			}
+
+			if ([campus objectForKey:@"show_flickr"])
+			{
+				NSNumber * showFlickr = [campus objectForKey:@"show_flickr"];
+				if ([showFlickr boolValue])
+				{
+					NSLog(@"flickr enabled");
+				}
+				else
+				{
+					NSLog(@"flickr disabled");
+				}
+
+				if (showFlickr)
+					[[NSUserDefaults standardUserDefaults] setObject:showFlickr forKey:@"show_flickr"];
+			}
+
+			if ([resultsDictionary objectForKey:@"service_times"])
+			{
+				NSArray * rawTimes = [resultsDictionary objectForKey:@"service_times"];
+
+				NSMutableArray * parsedTimes = [NSMutableArray array];
+
+				NSLog(@"current day of week: %ld", [self dayOfWeek]);
+
+				for (NSDictionary * time in rawTimes)
+				{
+					int day = [[time valueForKey:@"day"] intValue];
+					int hour = [[time valueForKey:@"hour"] intValue];
+					int minute = [[time valueForKey:@"minute"] intValue];
+
+
+
+					if (day == [self dayOfWeek] || day == [self tomorrowDayOfWeek])
+					{
+						unsigned unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
+						NSDate *date = [NSDate date];
+						if (day == [self tomorrowDayOfWeek])
+						{
+							date = [date dateByAddingTimeInterval:18400];
+						}
+						NSCalendar *calendar = [NSCalendar currentCalendar];
+						[calendar setTimeZone:[NSTimeZone localTimeZone]];
+						NSDateComponents *comps = [calendar components:unitFlags fromDate:date];
+
+						//update for the start date
+						[comps setHour:hour];
+						[comps setMinute:minute];
+						[comps setSecond:0];
+						NSDate *sDate = [calendar dateFromComponents:comps];
+
+						NSDateFormatter *df = [[NSDateFormatter alloc] init];
+						//[df setDateFormat:@"yyyy/MM/dd hh:mm:ss Z"];
+						[df setDateStyle:NSDateFormatterLongStyle];
+						[df setTimeStyle:NSDateFormatterLongStyle];
+						[df setTimeZone:[NSTimeZone localTimeZone]];
+
+						NSLog(@"adding date: %@", [df stringFromDate:sDate]);
+
+						[parsedTimes addObject:sDate];
+					}
+				}
+
+				dispatch_async(dispatch_get_main_queue(), ^{
+
+					NSLog(@"times: %@", parsedTimes);
+
+					self.serviceTimes = parsedTimes;
+
+				});
+			}
+
+			NSMutableArray * updatedAnnouncements = [NSMutableArray array];
+
+			if ([campus objectForKey:@"announcements_flickr_feed"])
+			{
+				NSString * feedUrl = [campus objectForKey:@"announcements_flickr_feed"];
+				NSLog(@"loading announcements flickr: %@", feedUrl);
+
+				NSError * err = nil;
+
+				NSURLResponse * response = nil;
+				NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL URLWithString:feedUrl]];
+
+				NSData* jsonData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
+
+				if (err)
+				{
+					dispatch_async(dispatch_get_main_queue(), ^{
+
+						errorBlock(err);
+
+						dispatch_release(reqQueue); //this executes on main thread
+
+					});
+
+					return;
+				}
+
+				if (!jsonData)
+				{
+					dispatch_async(dispatch_get_main_queue(), ^{
+
+						errorBlock([NSError errorWithDomain:@"Invalid data" code:0 userInfo:nil]);
+
+						dispatch_release(reqQueue); //this executes on main thread
+
+					});
+
+					return;
+				}
+
+				NSString * jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+
+				RKXMLParserLibXML * parser = [[RKXMLParserLibXML alloc] init];
+
+				NSDictionary * flickrResults = [parser parseXML:jsonString];
+
+
+				NSMutableArray * newImageUrls = [NSMutableArray array];
+
+				if ([[[flickrResults objectForKey:@"rss"] objectForKey:@"channel"] objectForKey:@"item"])
+				{
+					//NSLog(@"items: %@", NSStringFromClass([[[resultsDictionary objectForKey:@"rss"] objectForKey:@"channel"] objectForKey:@"item"]));
+
+					//NSLog(@"object count: %lu", [[[[resultsDictionary objectForKey:@"rss"] objectForKey:@"channel"] objectForKey:@"item"] count]);
+
+					for (NSDictionary * item in [[[flickrResults objectForKey:@"rss"] objectForKey:@"channel"] objectForKey:@"item"])
+					{
+
+						NSString * backgroundFileUrl = [[item objectForKey:@"content"] objectForKey:@"url"];
+
+						NSDictionary * newAnnouncement = @{@"title" : @"", @"show_logo" : @NO, @"background_file_url" : backgroundFileUrl};
+
+						[updatedAnnouncements addObject:newAnnouncement];
+
+						[self downloadImageSynchronouslyFromUrl:backgroundFileUrl];
+					}
+
+					if ([newImageUrls count] > 0)
+					{
+						_flickrImageUrls = newImageUrls;
+					}
+
+
+				}
+
+			}
+
+			if ([campus objectForKey:@"announcements"])
+			{
+				NSMutableArray * newAnnouncements = [[resultsDictionary objectForKey:@"announcements"] mutableCopy];
+
+				for (NSDictionary * ann in newAnnouncements)
+				{
+					if ([ann objectForKey:@"background_file_url"] && ![[ann objectForKey:@"background_file_url"] isEqual:[NSNull null]])
+					{
+						[self downloadImageSynchronouslyFromUrl:[ann objectForKey:@"background_file_url"]];
+					}
+				}
+				
+				[updatedAnnouncements addObjectsFromArray:newAnnouncements];
+				
+			}
+			
+			dispatch_async(dispatch_get_main_queue(), ^{
+				
+				self.announcements = updatedAnnouncements;
+				
+				completion();
+				
+				dispatch_release(reqQueue); //this executes on main thread
+				
+			});
+		}
+		
+		
+		
+	});
+}
+
 
 
 - (NSDate *)nextServiceTime;
@@ -556,6 +851,41 @@
 }
 
 
+
+
+- (void)downloadImageSynchronouslyFromUrl:(NSString *)imageUrl;
+{
+	NSError * err = nil;
+
+	NSURLResponse * response = nil;
+	NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL URLWithString:imageUrl]];
+
+	NSData* imageData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&err];
+
+	if (err)
+	{
+		return;
+	}
+
+	if (!imageData)
+	{
+		return;
+	}
+
+	if (![[NSFileManager defaultManager] fileExistsAtPath:[PCOAnnouncerController localCacheDirectoryPath]])
+	{
+		[[NSFileManager defaultManager] createDirectoryAtPath:[PCOAnnouncerController localCacheDirectoryPath] withIntermediateDirectories:YES attributes:nil error:nil];
+
+	}
+
+	NSLog(@"saving to %@", [self pathForImageFileAtUrl:imageUrl]);
+
+	if (![imageData writeToFile:[self pathForImageFileAtUrl:imageUrl] atomically:YES])
+	{
+		return;
+	}
+	
+}
 
 - (void)downloadImageFromUrl:(NSString *)imageUrl withCompletionBlock:(void (^)(void))completionBlock andErrorBlock:(void (^)(NSError * error))errorBlock;
 {

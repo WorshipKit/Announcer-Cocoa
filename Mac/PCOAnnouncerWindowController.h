@@ -30,7 +30,10 @@
 	
 	PCOControlResponseWindow * announcementsWindow;
 	
-	QTMovieLayer * backgroundLayer;
+	QTMovieLayer * backgroundLayer1;
+	QTMovieLayer * backgroundLayer2;
+	QTMovieLayer * activeBackgroundLayer;
+
 	QTMovieLayer * logoLayer;
 	
 	CATextLayer * titleLayer;
@@ -42,7 +45,9 @@
 	
 
 	PCOControlResponseWindow * flickrWindow;
-	QTMovieLayer * flickrLayer;
+	QTMovieLayer * flickrLayer1;
+	QTMovieLayer * flickrLayer2;
+	QTMovieLayer * activeFlickrLayer;
 }
 
 //- (IBAction)toggleFlickr:(id)sender;
