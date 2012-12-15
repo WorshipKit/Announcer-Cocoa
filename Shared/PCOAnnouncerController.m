@@ -158,6 +158,7 @@
 			{
 				NSString * flickrFeedUrl = [campus objectForKey:@"photo_flickr_feed"];
 				NSLog(@"flickr feed updated: %@", flickrFeedUrl);
+				self.flickrFeedUrl = flickrFeedUrl;
 
 				[[NSUserDefaults standardUserDefaults] setObject:flickrFeedUrl forKey:@"flickr_feed_url"];
 			}
@@ -410,38 +411,41 @@
 	{
 		NSDate * activeDate = [self nextServiceTime];
 		double secondsRemaining = [[NSDate date] timeIntervalSinceDate:activeDate] * -1;
-
-		double remainder = secondsRemaining;
-		int hours = remainder / 3600;
-		remainder = remainder - (hours * 3600);
-		int minutes = remainder / 60;
-		remainder = remainder - (minutes * 60);
-		//int seconds = remainder;
-
-		NSString * seconds = [NSString stringWithFormat:@"%d", (int)remainder];
-		if (remainder < 10)
+		
+		if (secondsRemaining < 3600)
 		{
-			seconds = [NSString stringWithFormat:@"0%d", (int)remainder];
-		}
+			double remainder = secondsRemaining;
+			int hours = remainder / 3600;
+			remainder = remainder - (hours * 3600);
+			int minutes = remainder / 60;
+			remainder = remainder - (minutes * 60);
+			//int seconds = remainder;
 
-		NSString * formatString = [NSString stringWithFormat:@"%d:%d:%@", hours, minutes, seconds];
-		if (hours == 0)
-		{
-			formatString = [NSString stringWithFormat:@"%d:%@", minutes, seconds];
-
-			if (minutes == 0)
+			NSString * seconds = [NSString stringWithFormat:@"%d", (int)remainder];
+			if (remainder < 10)
 			{
-				formatString = [NSString stringWithFormat:@"%@", seconds];
+				seconds = [NSString stringWithFormat:@"0%d", (int)remainder];
 			}
+
+			NSString * formatString = [NSString stringWithFormat:@"%d:%d:%@", hours, minutes, seconds];
+			if (hours == 0)
+			{
+				formatString = [NSString stringWithFormat:@"%d:%@", minutes, seconds];
+
+				if (minutes == 0)
+				{
+					formatString = [NSString stringWithFormat:@"%@", seconds];
+				}
+			}
+
+
+			if (![self shouldShowBigCountdown])
+			{
+				return [NSString stringWithFormat:@"Service starts in %@", formatString];
+			}
+			
+			return formatString;
 		}
-
-
-		if (![self shouldShowBigCountdown])
-		{
-			return [NSString stringWithFormat:@"Service starts in %@", formatString];
-		}
-
-		return formatString;
 	}
 
 	if ([self shouldShowClock])
@@ -679,7 +683,8 @@
 {
 	[flickrTimer invalidate], flickrTimer = nil;
 
-
+	NSLog(@"flickr paths count: %ld", [[self flickrImageUrls] count]);
+	
 	NSInteger picIndex = currentFlickrIndex + 1;
 
 	if (picIndex < 0)
@@ -691,13 +696,15 @@
 	{
 		picIndex = 0;
 	}
-
+	
 
 	NSString * backgroundUrl = [[self flickrImageUrls] objectAtIndex:picIndex];
 	NSString * backgroundPath = nil;
 	if ([backgroundUrl isKindOfClass:[NSString class]])
 	{
 		backgroundPath = [self pathForImageFileAtUrl:backgroundUrl];
+		self.currentFlickrImagePath = backgroundPath;
+		NSLog(@"flickr path: %@", self.currentFlickrImagePath);
 	}
 
 	currentFlickrIndex = picIndex;
@@ -710,6 +717,8 @@
 	}
 
 	flickrTimer = [NSTimer scheduledTimerWithTimeInterval:secondsPerPicture target:self selector:@selector(nextPicture) userInfo:nil repeats:YES];
+
+	completionBlock();
 }
 
 - (void)showPreviousFlickrImage:(void (^)(void))completionBlock;
@@ -1314,7 +1323,15 @@
 
 - (void)loadFlickrFeedWithCompletionBlock:(void (^)(void))completion andErrorBlock:(void (^)(NSError * error))errorBlock;
 {
-	
+	if (!self.flickrFeedUrl)
+	{
+		NSLog(@"no flickr feed defined.");
+		errorBlock(nil);
+		return;
+	}
+
+	NSLog(@"flickr feed: %@", self.flickrFeedUrl);
+
 	dispatch_queue_t reqQueue = dispatch_queue_create("com.pco.announcer.requests", NULL);
     dispatch_async(reqQueue, ^{
 		

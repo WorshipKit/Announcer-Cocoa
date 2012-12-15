@@ -245,10 +245,31 @@
 		NSLog(@"show already running.");
 		return;
 	}
-
+	
 	[announcementsActivitySpinner startAnimation:nil];
 
 	[announcerController loadFeedAndUpdateImagesWithCompletionBlock:^{
+
+		[announcerController loadFlickrFeedWithCompletionBlock:^{
+
+			if ([announcerController shouldShowFlickr] == YES && [[NSScreen screens] count] > 1)
+			{
+				flickrWindow = [[PCOControlResponseWindow alloc] initWithContentRect:[[[NSScreen screens] objectAtIndex:1] frame] styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
+				flickrWindow.keyPressDelegate = self;
+				flickrWindow.delegate = self;
+				[flickrWindow setLevel:NSScreenSaverWindowLevel];
+				[flickrWindow setBackgroundColor:[NSColor blackColor]];
+
+				[flickrWindow makeKeyAndOrderFront:self];
+
+				[[flickrWindow contentView] setWantsLayer:YES];
+
+				[self nextPicture];
+			}
+
+		} andErrorBlock:^(NSError * error) {
+
+		}];
 
 		[announcementsActivitySpinner stopAnimation:nil];
 
@@ -322,23 +343,7 @@
 		bigClockLayer.hidden = YES;
 
 		//}
-
-		if ([announcerController shouldShowFlickr] == YES && [[NSScreen screens] count] > 1)
-		{
-			flickrWindow = [[PCOControlResponseWindow alloc] initWithContentRect:[[[NSScreen screens] objectAtIndex:1] frame] styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
-			flickrWindow.keyPressDelegate = self;
-			flickrWindow.delegate = self;
-			[flickrWindow setLevel:NSScreenSaverWindowLevel];
-			[flickrWindow setBackgroundColor:[NSColor blackColor]];
-
-			[flickrWindow makeKeyAndOrderFront:self];
-
-			[[flickrWindow contentView] setWantsLayer:YES];
-
-			[self nextPicture];
-		}
-
-
+		
 
 		if ([[announcerController announcements] count] > 0)
 		{
@@ -603,100 +608,69 @@
 
 - (void)updateFlickrImage;
 {
-	__block CALayer * layerToFadeOut = activeBackgroundLayer;
+	if (!flickrWindow)
+	{
+		return;
+	}
+
+	__block CALayer * layerToFadeOut = activeFlickrLayer;
 	__block CALayer * layerToFadeIn = nil;
 	
 	
-	if (announcerController.currentBackgroundPath)
+	NSError * loadErr = nil;
+
+	if (![[NSFileManager defaultManager] fileExistsAtPath:announcerController.currentFlickrImagePath])
 	{
-		NSError * loadErr = nil;
-
-
-		QTMovie * backgroundMovie = [QTMovie movieWithFile:announcerController.currentFlickrImagePath error:&loadErr];
-		QTMovieLayer * newFlickrLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
-		newFlickrLayer.contentsGravity = kCAGravityResizeAspect;
-
-		newFlickrLayer.frame = [[flickrWindow contentView] layer].bounds;
-
-		[[[flickrWindow contentView] layer] addSublayer:newFlickrLayer];
-		
-
-		layerToFadeOut = activeFlickrLayer;
-
-		if (activeBackgroundLayer == backgroundLayer1)
-		{
-			backgroundLayer2 = newFlickrLayer;
-		}
-		else if (activeBackgroundLayer == backgroundLayer2)
-		{
-			backgroundLayer1 = newFlickrLayer;
-		}
-
-		layerToFadeIn = newFlickrLayer;
-		activeFlickrLayer = newFlickrLayer;
-
-		CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
-		animation.duration = 0.5;
-		animation.repeatCount = 0;
-		animation.fromValue = [NSNumber numberWithFloat:0];
-		animation.toValue = [NSNumber numberWithFloat:1.0];
-
-		CAAnimationBlockDelegate *delegate =
-		[[CAAnimationBlockDelegate alloc] init];
-		// Define block that gets invoked after
-		// animation starts
-		delegate.blockOnAnimationStarted = ^() {
-
-		};
-		// Define block that gets invoked after
-		// animation succeeds
-		delegate.blockOnAnimationSucceeded = ^() {
-
-			CABasicAnimation * fadeOutAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
-			fadeOutAnimation.duration = 0.5;
-			fadeOutAnimation.repeatCount = 0;
-			fadeOutAnimation.fromValue = [NSNumber numberWithFloat:1.0];
-			fadeOutAnimation.toValue = [NSNumber numberWithFloat:0];
-
-			CAAnimationBlockDelegate *delegate =
-			[[CAAnimationBlockDelegate alloc] init];
-			// Define block that gets invoked after
-			// animation starts
-			delegate.blockOnAnimationStarted = ^() {
-				// your logic goes here ...
-			};
-			// Define block that gets invoked after
-			// animation succeeds
-			delegate.blockOnAnimationSucceeded = ^() {
-				if (layerToFadeOut == backgroundLayer1)
-				{
-					flickrLayer1 = nil;
-				}
-				else if (layerToFadeOut == backgroundLayer2)
-				{
-					flickrLayer2 = nil;
-				}
-
-				[layerToFadeOut removeFromSuperlayer];
-				layerToFadeOut = nil;
-
-				activeBackgroundLayer = nil;
-			};
-			fadeOutAnimation.delegate = delegate;
-
-			[layerToFadeOut addAnimation:fadeOutAnimation forKey:@"fadeOut"];
-
-			activeBackgroundLayer = nil;
-
-		};
-		animation.delegate = delegate;
-
-		[layerToFadeIn addAnimation:animation forKey:@"fadeOut"];
-
-		activeBackgroundLayer = nil;
+		NSLog(@"flickr file doesn't exist");
 	}
-	else
+
+	QTMovie * backgroundMovie = [QTMovie movieWithFile:announcerController.currentFlickrImagePath error:&loadErr];
+
+	if (loadErr)
 	{
+		NSLog(@"loading flickr error: %@", [loadErr localizedDescription]);
+	}
+
+	QTMovieLayer * newFlickrLayer = [QTMovieLayer layerWithMovie:backgroundMovie];
+	newFlickrLayer.contentsGravity = kCAGravityResizeAspect;
+
+	newFlickrLayer.frame = [[flickrWindow contentView] layer].bounds;
+
+	[[[flickrWindow contentView] layer] addSublayer:newFlickrLayer];
+
+	NSLog(@"showing flickr image....");
+
+	layerToFadeOut = activeFlickrLayer;
+
+	if (activeFlickrLayer == flickrLayer1)
+	{
+		flickrLayer2 = newFlickrLayer;
+	}
+	else if (activeFlickrLayer == flickrLayer2)
+	{
+		flickrLayer1 = newFlickrLayer;
+	}
+
+	layerToFadeIn = newFlickrLayer;
+	activeFlickrLayer = newFlickrLayer;
+
+	CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+	animation.duration = 0.5;
+	animation.repeatCount = 0;
+	animation.fromValue = [NSNumber numberWithFloat:0];
+	animation.toValue = [NSNumber numberWithFloat:1.0];
+
+	CAAnimationBlockDelegate *delegate =
+	[[CAAnimationBlockDelegate alloc] init];
+	// Define block that gets invoked after
+	// animation starts
+	delegate.blockOnAnimationStarted = ^() {
+
+	};
+	// Define block that gets invoked after
+	// animation succeeds
+	delegate.blockOnAnimationSucceeded = ^() {
+
 		CABasicAnimation * fadeOutAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
 		fadeOutAnimation.duration = 0.5;
 		fadeOutAnimation.repeatCount = 0;
@@ -725,25 +699,27 @@
 			[layerToFadeOut removeFromSuperlayer];
 			layerToFadeOut = nil;
 
-			activeFlickrLayer = nil;
 		};
 		fadeOutAnimation.delegate = delegate;
-
-		[layerToFadeOut addAnimation:fadeOutAnimation forKey:@"fadeOut"];
 		
-		activeFlickrLayer = nil;
-	}
+		[layerToFadeOut addAnimation:fadeOutAnimation forKey:@"fadeOut"];
 
+		NSLog(@"flickr image faded in");
 
+	};
+	animation.delegate = delegate;
 
-	
+	[layerToFadeIn addAnimation:animation forKey:@"fadeOut"];
+
+	NSLog(@"animations created");
+
 }
 
 
 
 - (void)showBigLogo;
 {
-	
+
 	[titleLayer removeFromSuperlayer];
 	titleLayer = nil;
 
@@ -811,6 +787,7 @@
 	
 	[announcerController showNextFlickrImageWithCompletion:^{
 
+		NSLog(@"flickr model updated. displaying image.");
 		[self updateFlickrImage];
 
 	}];
