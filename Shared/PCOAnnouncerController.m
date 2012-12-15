@@ -65,6 +65,15 @@
 
 - (void)loadFeedAndUpdateImagesWithCompletionBlock:(void (^)(void))completion errorBlock:(void (^)(NSError * error))errorBlock;
 {
+	if (!self.announcementsFeedUrl)
+	{
+		errorBlock(nil);
+
+		return;
+	}
+
+	NSLog(@"announcer feed URL: %@", self.announcementsFeedUrl);
+
 	dispatch_queue_t reqQueue = dispatch_queue_create("com.pco.announcer.requests", NULL);
     dispatch_async(reqQueue, ^{
 
@@ -108,7 +117,7 @@
 
 		NSLog(@"result: %@", resultsDictionary);
 
-		if ([resultsDictionary objectForKey:@"campus"])
+		if ([resultsDictionary objectForKey:@"campus"] && [[resultsDictionary objectForKey:@"campus"] isKindOfClass:[NSDictionary class]])
 		{
 			NSDictionary * campus = [resultsDictionary objectForKey:@"campus"];
 
@@ -117,7 +126,8 @@
 				NSNumber * seconds = [campus objectForKey:@"default_seconds_per_slide"];
 				NSLog(@"seconds per picture: %d", [seconds intValue]);
 
-				[[NSUserDefaults standardUserDefaults] setObject:seconds forKey:@"seconds_per_picture"];
+				if (seconds)
+					[[NSUserDefaults standardUserDefaults] setObject:seconds forKey:@"seconds_per_picture"];
 			}
 
 			if ([campus objectForKey:@"logo_file_url"])
@@ -160,7 +170,8 @@
 				NSLog(@"flickr feed updated: %@", flickrFeedUrl);
 				self.flickrFeedUrl = flickrFeedUrl;
 
-				[[NSUserDefaults standardUserDefaults] setObject:flickrFeedUrl forKey:@"flickr_feed_url"];
+				if (flickrFeedUrl)
+					[[NSUserDefaults standardUserDefaults] setObject:flickrFeedUrl forKey:@"flickr_feed_url"];
 			}
 
 			if ([campus objectForKey:@"show_clock"])
@@ -195,7 +206,7 @@
 					[[NSUserDefaults standardUserDefaults] setObject:showFlickr forKey:@"show_flickr"];
 			}
 
-			if ([resultsDictionary objectForKey:@"service_times"])
+			if ([resultsDictionary objectForKey:@"service_times"] && [[resultsDictionary objectForKey:@"service_times"] isKindOfClass:[NSDictionary class]])
 			{
 				NSArray * rawTimes = [resultsDictionary objectForKey:@"service_times"];
 
@@ -292,6 +303,19 @@
 
 				NSString * jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 
+				if (!jsonString)
+				{
+					dispatch_async(dispatch_get_main_queue(), ^{
+
+						errorBlock([NSError errorWithDomain:@"Invalid data" code:0 userInfo:nil]);
+
+						dispatch_release(reqQueue); //this executes on main thread
+
+					});
+					
+					return;
+				}
+
 				RKXMLParserLibXML * parser = [[RKXMLParserLibXML alloc] init];
 
 				NSDictionary * flickrResults = [parser parseXML:jsonString];
@@ -310,24 +334,31 @@
 
 						NSString * backgroundFileUrl = [[item objectForKey:@"content"] objectForKey:@"url"];
 
-						NSDictionary * newAnnouncement = @{@"title" : @"", @"show_logo" : @NO, @"background_file_url" : backgroundFileUrl};
+						if (backgroundFileUrl)
+						{
+							NSDictionary * newAnnouncement = @{@"title" : @"", @"show_logo" : @NO, @"background_file_url" : backgroundFileUrl};
 
-						[updatedAnnouncements addObject:newAnnouncement];
+							[updatedAnnouncements addObject:newAnnouncement];
 
-						[self downloadImageSynchronouslyFromUrl:backgroundFileUrl];
+							[self downloadImageSynchronouslyFromUrl:backgroundFileUrl];
+						}
 					}
 
-					if ([newImageUrls count] > 0)
-					{
-						_flickrImageUrls = newImageUrls;
-					}
+					dispatch_async(dispatch_get_main_queue(), ^{
 
+						if ([newImageUrls count] > 0)
+						{
+							_flickrImageUrls = newImageUrls;
+						}
+
+					});
+					
 
 				}
 
 			}
 
-			if ([campus objectForKey:@"announcements"])
+			if ([campus objectForKey:@"announcements"] && [[campus objectForKey:@"announcements"] isKindOfClass:[NSArray class]])
 			{
 				NSMutableArray * newAnnouncements = [[resultsDictionary objectForKey:@"announcements"] mutableCopy];
 
@@ -1066,7 +1097,8 @@
 				NSNumber * seconds = [campus objectForKey:@"default_seconds_per_slide"];
 				NSLog(@"seconds per picture: %d", [seconds intValue]);
 
-				[[NSUserDefaults standardUserDefaults] setObject:seconds forKey:@"seconds_per_picture"];
+				if (seconds)
+					[[NSUserDefaults standardUserDefaults] setObject:seconds forKey:@"seconds_per_picture"];
 			}
 
 			if ([campus objectForKey:@"logo_file_url"])
@@ -1108,7 +1140,8 @@
 				NSString * flickrFeedUrl = [campus objectForKey:@"photo_flickr_feed"];
 				NSLog(@"flickr feed updated: %@", flickrFeedUrl);
 
-				[[NSUserDefaults standardUserDefaults] setObject:flickrFeedUrl forKey:@"flickr_feed_url"];
+				if (flickrFeedUrl)
+					[[NSUserDefaults standardUserDefaults] setObject:flickrFeedUrl forKey:@"flickr_feed_url"];
 			}
 
 			if ([campus objectForKey:@"show_clock"])
@@ -1258,15 +1291,18 @@
 
 						NSString * backgroundFileUrl = [[item objectForKey:@"content"] objectForKey:@"url"];
 
-						NSDictionary * newAnnouncement = @{@"title" : @"", @"show_logo" : @NO, @"background_file_url" : backgroundFileUrl};
+						if (backgroundFileUrl)
+						{
+							NSDictionary * newAnnouncement = @{@"title" : @"", @"show_logo" : @NO, @"background_file_url" : backgroundFileUrl};
 
-						[updatedAnnouncements addObject:newAnnouncement];
+							[updatedAnnouncements addObject:newAnnouncement];
 
-						[self downloadImageFromUrl:[[item objectForKey:@"content"] objectForKey:@"url"] withCompletionBlock:^{
-							NSLog(@"image downloaded");
-						} andErrorBlock:^(NSError * error) {
-							NSLog(@"error loading image: %@", [error localizedDescription]);
-						}];
+							[self downloadImageFromUrl:[[item objectForKey:@"content"] objectForKey:@"url"] withCompletionBlock:^{
+								NSLog(@"image downloaded");
+							} andErrorBlock:^(NSError * error) {
+								NSLog(@"error loading image: %@", [error localizedDescription]);
+							}];
+						}
 					}
 
 					if ([newImageUrls count] > 0)
@@ -1369,23 +1405,23 @@
 		}
 		
 		NSString * jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-		
+
+		if (!jsonString)
+		{
+			dispatch_async(dispatch_get_main_queue(), ^{
+
+				errorBlock([NSError errorWithDomain:@"Invalid data" code:0 userInfo:nil]);
+
+				dispatch_release(reqQueue); //this executes on main thread
+
+			});
+
+			return;
+		}
+
 		RKXMLParserLibXML * parser = [[RKXMLParserLibXML alloc] init];
 		
 		NSDictionary *resultsDictionary = [parser parseXML:jsonString];
-		
-		/*
-		 if ([resultsDictionary objectForKey:@"announcements"])
-		 {
-		 announcements = [[resultsDictionary objectForKey:@"announcements"] copy];
-		 
-		 completion();
-		 }
-		 else
-		 {
-		 errorBlock([NSError errorWithDomain:@"No announcements" code:0 userInfo:nil]);
-		 }
-		 */
 		
 		if (!resultsDictionary)
 		{
@@ -1399,7 +1435,9 @@
 			
 			return;
 		}
-		
+
+		NSLog(@"flickr dictionary: %@", resultsDictionary);
+
 		NSMutableArray * newImageUrls = [NSMutableArray array];
 		
 		if ([[[resultsDictionary objectForKey:@"rss"] objectForKey:@"channel"] objectForKey:@"item"])
@@ -1411,23 +1449,26 @@
 			for (NSDictionary * item in [[[resultsDictionary objectForKey:@"rss"] objectForKey:@"channel"] objectForKey:@"item"])
 			{
 				//NSLog(@"item content: %@", [[item objectForKey:@"content"] objectForKey:@"url"]);
-				
-				[newImageUrls addObject:[[item objectForKey:@"content"] objectForKey:@"url"]];
-				
-				[self downloadImageFromUrl:[[item objectForKey:@"content"] objectForKey:@"url"] withCompletionBlock:^{
-					NSLog(@"image downloaded");
-				} andErrorBlock:^(NSError * error) {
-					NSLog(@"error loading image: %@", [error localizedDescription]);
-				}];
-			}
-			
-			if ([newImageUrls count] > 0)
-			{
-				_flickrImageUrls = newImageUrls;
+
+				if ([[item objectForKey:@"content"] objectForKey:@"url"])
+				{
+					[newImageUrls addObject:[[item objectForKey:@"content"] objectForKey:@"url"]];
+
+					[self downloadImageFromUrl:[[item objectForKey:@"content"] objectForKey:@"url"] withCompletionBlock:^{
+						NSLog(@"image downloaded");
+					} andErrorBlock:^(NSError * error) {
+						NSLog(@"error loading image: %@", [error localizedDescription]);
+					}];
+				}
 			}
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
-				
+
+				if ([newImageUrls count] > 0)
+				{
+					_flickrImageUrls = newImageUrls;
+				}
+
 				completion();
 				
 				dispatch_release(reqQueue); //this executes on main thread

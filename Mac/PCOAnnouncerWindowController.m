@@ -94,11 +94,11 @@
 	[announcementsActivitySpinner startAnimation:sender];
 
 	announcerController.announcementsFeedUrl = feedUrl;
+	
+	[announcerController loadFeedAndUpdateImagesWithCompletionBlock:^{
 
-	[announcerController loadAnnouncementsWithCompletionBlock:^{
-		
 		[announcementsActivitySpinner stopAnimation:sender];
-		
+
 		announcementsStatusLabel.stringValue = [NSString stringWithFormat:@"Feed is ready. Found %ld announcements", [announcerController.announcements count]];
 
 		if (announcementsWindow)
@@ -106,13 +106,14 @@
 			[self nextSlide];
 		}
 
-	} andErrorBlock:^(NSError * error) {
+	} errorBlock:^(NSError * error) {
+
 		NSLog(@"error: %@", [error localizedDescription]);
-		
+
 		[announcementsActivitySpinner stopAnimation:sender];
-		
+
 		announcementsStatusLabel.stringValue = @"Failed trying to update announcements";
-		
+
 	}];
 }
 
@@ -193,7 +194,11 @@
 - (float)actualFontSizeForText:(NSString *)text withFont:(NSFont *)aFont withOriginalSize:(float)originalSize;
 {
 	float scaledSize = originalSize * [self textScaleRatio];
-	
+
+	if (!aFont)
+	{
+		aFont = [NSFont systemFontOfSize:scaledSize];
+	}
 	aFont = [NSFont fontWithName:aFont.fontName size:scaledSize];
 	
 	float longestLineWidth = 1;
@@ -249,7 +254,7 @@
 	[announcementsActivitySpinner startAnimation:nil];
 
 	[announcerController loadFeedAndUpdateImagesWithCompletionBlock:^{
-
+		
 		[announcerController loadFlickrFeedWithCompletionBlock:^{
 
 			if ([announcerController shouldShowFlickr] == YES && [[NSScreen screens] count] > 1)
@@ -270,11 +275,11 @@
 		} andErrorBlock:^(NSError * error) {
 
 		}];
-
+		
 		[announcementsActivitySpinner stopAnimation:nil];
 
 		NSLog(@"found %lu announcements to show.", [[announcerController currentAnnouncements] count]);
-
+		
 		//NSRect frameRect = NSMakeRect(100, 100, 340, 280);
 		NSRect frameRect = [[NSScreen mainScreen] frame];
 
@@ -291,16 +296,19 @@
 		[[announcementsWindow contentView] setWantsLayer:YES];
 
 
-		//if ([announcerController shouldShowClock] == YES)
-		//{
 		clockLayer = [CATextLayer layer];
 
 		clockLayer.frame = [[[announcementsWindow contentView] layer] bounds];
-
+		
 		clockLayer.string = [announcerController currentClockString];
 
 		float clockSize = 35;
 		NSFont * clockFont = [NSFont fontWithName:@"Myriad Pro Bold" size:clockSize];
+		if (!clockFont)
+		{
+			clockFont = [NSFont boldSystemFontOfSize:clockSize];
+		}
+		
 		clockSize = [self actualFontSizeForText:clockLayer.string withFont:clockFont withOriginalSize:clockSize];
 		clockFont = [NSFont fontWithName:clockFont.fontName size:clockSize];
 
@@ -316,7 +324,7 @@
 
 		[[[announcementsWindow contentView] layer] addSublayer:clockLayer];
 
-
+		
 		bigClockLayer = [CATextLayer layer];
 
 		bigClockLayer.frame = [[[announcementsWindow contentView] layer] bounds];
@@ -325,6 +333,11 @@
 
 		float bigClockSize = 150;
 		NSFont * bigClockFont = [NSFont fontWithName:@"Myriad Pro Bold" size:bigClockSize];
+		if (!bigClockFont)
+		{
+			bigClockFont = [NSFont boldSystemFontOfSize:bigClockSize];
+		}
+		
 		bigClockSize = [self actualFontSizeForText:bigClockLayer.string withFont:bigClockFont withOriginalSize:bigClockSize];
 		bigClockFont = [NSFont fontWithName:bigClockFont.fontName size:bigClockSize];
 
@@ -341,8 +354,6 @@
 		[[[announcementsWindow contentView] layer] addSublayer:bigClockLayer];
 
 		bigClockLayer.hidden = YES;
-
-		//}
 		
 
 		if ([[announcerController announcements] count] > 0)
@@ -353,7 +364,7 @@
 		{
 			[self showBigLogo];
 		}
-
+		
 	} errorBlock:^(NSError * error) {
 
 		[announcementsActivitySpinner stopAnimation:nil];
@@ -543,8 +554,14 @@
 
 
 
-	float titleFontSize = [self actualFontSizeForText:announcerController.currentTitle withFont:[NSFont fontWithName:@"Myriad Pro Bold" size:55] withOriginalSize:55];
-	NSFont * titleFont = [NSFont fontWithName:@"Myriad Pro Bold" size:titleFontSize];
+	NSFont * titleFont = [NSFont fontWithName:@"Myriad Pro Bold" size:55];
+	if (!titleFont)
+	{
+		titleFont = [NSFont boldSystemFontOfSize:55];
+	}
+
+	float titleFontSize = [self actualFontSizeForText:announcerController.currentTitle withFont:titleFont withOriginalSize:55];
+	titleFont = [NSFont fontWithName:titleFont.fontName size:titleFontSize];
 
 	NSSize titleBoxSize = [announcerController.currentTitle sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
 
@@ -558,8 +575,16 @@
 	[activeBackgroundLayer addSublayer:titleLayer];
 
 
-	float bodyFontSize = [self actualFontSizeForText:announcerController.currentBody withFont:[NSFont fontWithName:@"Myriad Pro" size:45] withOriginalSize:45];
-	NSFont * bodyFont = [NSFont fontWithName:@"Myriad Pro" size:bodyFontSize];
+	NSFont * bodyFont = [NSFont fontWithName:@"Myriad Pro" size:45];
+	if (!bodyFont)
+	{
+		bodyFont = [NSFont systemFontOfSize:45];
+	}
+
+	float bodyFontSize = [self actualFontSizeForText:announcerController.currentBody withFont:bodyFont withOriginalSize:45];
+
+	bodyFont = [NSFont fontWithName:bodyFont.fontName size:bodyFont.pointSize];
+
 
 	bodyLayer = [CATextLayer layer];
 	bodyLayer.frame = CGRectMake(activeBackgroundLayer.bounds.origin.x, activeBackgroundLayer.bounds.origin.y, activeBackgroundLayer.bounds.size.width, activeBackgroundLayer.bounds.size.height - titleBoxSize.height - 45);
