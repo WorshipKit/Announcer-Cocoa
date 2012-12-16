@@ -22,6 +22,25 @@
 		58D87ACC155EE92E004027CD /* RKXMLParserLibXML.m in Sources */ = {isa = PBXBuildFile; fileRef = 58D87ACB155EE92E004027CD /* RKXMLParserLibXML.m */; };
 		58D87ACD155EE92E004027CD /* RKXMLParserLibXML.m in Sources */ = {isa = PBXBuildFile; fileRef = 58D87ACB155EE92E004027CD /* RKXMLParserLibXML.m */; };
 		58D87AE5155EEA0A004027CD /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 58D87AE4155EEA0A004027CD /* libxml2.dylib */; };
+		58DB1831167D66D000C8E000 /* PCOAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5C571553613E00DB4EB9 /* PCOAppDelegate.m */; };
+		58DB1832167D66D000C8E000 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5C5A1553615100DB4EB9 /* main.m */; };
+		58DB1833167D66D000C8E000 /* PCOAnnouncerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 960A5CA415536A2E00DB4EB9 /* PCOAnnouncerController.m */; };
+		58DB1834167D66D000C8E000 /* PCOAnnouncerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 58D87AAC155ECEB2004027CD /* PCOAnnouncerWindowController.m */; };
+		58DB1835167D66D000C8E000 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 58D87AB2155EDA28004027CD /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		58DB1836167D66D000C8E000 /* RKXMLParserLibXML.m in Sources */ = {isa = PBXBuildFile; fileRef = 58D87ACB155EE92E004027CD /* RKXMLParserLibXML.m */; };
+		58DB1837167D66D000C8E000 /* PCOControlResponseWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 96621B57156BD62400B9C7CC /* PCOControlResponseWindow.m */; };
+		58DB1838167D66D000C8E000 /* CAAnimationBlockDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 58391F5A167CEBD0009DB7CE /* CAAnimationBlockDelegate.m */; };
+		58DB183A167D66D000C8E000 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96621B59156BFDAE00B9C7CC /* QTKit.framework */; };
+		58DB183B167D66D000C8E000 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58B999A7156A7E3B009BA4C8 /* QuartzCore.framework */; };
+		58DB183C167D66D000C8E000 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 58D87AE4155EEA0A004027CD /* libxml2.dylib */; };
+		58DB183D167D66D000C8E000 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960A5BF415535E5800DB4EB9 /* Cocoa.framework */; };
+		58DB183E167D66D000C8E000 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58B9C0C91634B880001D3A1E /* Sparkle.framework */; };
+		58DB1840167D66D000C8E000 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C5B1553615100DB4EB9 /* MainMenu.xib */; };
+		58DB1841167D66D000C8E000 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C5D1553615100DB4EB9 /* InfoPlist.strings */; };
+		58DB1842167D66D000C8E000 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 960A5C5F1553615100DB4EB9 /* Credits.rtf */; };
+		58DB1843167D66D000C8E000 /* PCOAnnouncerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 58D87AAD155ECEB2004027CD /* PCOAnnouncerWindowController.xib */; };
+		58DB1844167D66D000C8E000 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 58B9C0CD1634BFBC001D3A1E /* dsa_pub.pem */; };
+		58DB1846167D66D000C8E000 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 58B9C0C91634B880001D3A1E /* Sparkle.framework */; };
 		960A5BA615535BE300DB4EB9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960A5BA515535BE300DB4EB9 /* UIKit.framework */; };
 		960A5BA815535BE300DB4EB9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960A5BA715535BE300DB4EB9 /* Foundation.framework */; };
 		960A5BAA15535BE300DB4EB9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960A5BA915535BE300DB4EB9 /* CoreGraphics.framework */; };
@@ -85,6 +104,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		58DB1845167D66D000C8E000 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				58DB1846167D66D000C8E000 /* Sparkle.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -101,6 +130,8 @@
 		58D87ACA155EE92E004027CD /* RKXMLParserLibXML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKXMLParserLibXML.h; sourceTree = "<group>"; };
 		58D87ACB155EE92E004027CD /* RKXMLParserLibXML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKXMLParserLibXML.m; sourceTree = "<group>"; };
 		58D87AE4155EEA0A004027CD /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/usr/lib/libxml2.dylib; sourceTree = DEVELOPER_DIR; };
+		58DB184A167D66D000C8E000 /* Announcer Mac copy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Announcer Mac copy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		58DB184C167D66D000C8E000 /* Announcer Mac copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Announcer Mac copy-Info.plist"; path = "/Users/jterhorst/Documents/programming/Planning Center/Announcer-Cocoa/Announcer Mac copy-Info.plist"; sourceTree = "<absolute>"; };
 		960A5BA115535BE300DB4EB9 /* Announcer iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Announcer iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		960A5BA515535BE300DB4EB9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		960A5BA715535BE300DB4EB9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -146,6 +177,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		58DB1839167D66D000C8E000 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				58DB183A167D66D000C8E000 /* QTKit.framework in Frameworks */,
+				58DB183B167D66D000C8E000 /* QuartzCore.framework in Frameworks */,
+				58DB183C167D66D000C8E000 /* libxml2.dylib in Frameworks */,
+				58DB183D167D66D000C8E000 /* Cocoa.framework in Frameworks */,
+				58DB183E167D66D000C8E000 /* Sparkle.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		960A5B9E15535BE300DB4EB9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -217,6 +260,7 @@
 				960A5C2615535EDA00DB4EB9 /* Unit Tests */,
 				960A5BA415535BE300DB4EB9 /* Frameworks */,
 				960A5BA215535BE300DB4EB9 /* Products */,
+				58DB184C167D66D000C8E000 /* Announcer Mac copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -227,6 +271,7 @@
 				960A5BD615535BE300DB4EB9 /* Announcer iOS Unit Tests.octest */,
 				960A5BF215535E5800DB4EB9 /* Announcer.app */,
 				960A5C1115535E5800DB4EB9 /* Announcer Mac Unit Tests.octest */,
+				58DB184A167D66D000C8E000 /* Announcer Mac copy.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -386,6 +431,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		58DB182F167D66D000C8E000 /* Announcer Mac debug */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 58DB1847167D66D000C8E000 /* Build configuration list for PBXNativeTarget "Announcer Mac debug" */;
+			buildPhases = (
+				58DB1830167D66D000C8E000 /* Sources */,
+				58DB1839167D66D000C8E000 /* Frameworks */,
+				58DB183F167D66D000C8E000 /* Resources */,
+				58DB1845167D66D000C8E000 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Announcer Mac debug";
+			productName = "Announcer Mac";
+			productReference = 58DB184A167D66D000C8E000 /* Announcer Mac copy.app */;
+			productType = "com.apple.product-type.application";
+		};
 		960A5BA015535BE300DB4EB9 /* Announcer iOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 960A5BE815535BE300DB4EB9 /* Build configuration list for PBXNativeTarget "Announcer iOS" */;
@@ -490,6 +553,7 @@
 				960A5BD515535BE300DB4EB9 /* Announcer iOS Unit Tests */,
 				960A5BF115535E5800DB4EB9 /* Announcer Mac */,
 				960A5C1015535E5800DB4EB9 /* Announcer Mac Unit Tests */,
+				58DB182F167D66D000C8E000 /* Announcer Mac debug */,
 			);
 		};
 /* End PBXProject section */
@@ -505,6 +569,18 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		58DB183F167D66D000C8E000 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				58DB1840167D66D000C8E000 /* MainMenu.xib in Resources */,
+				58DB1841167D66D000C8E000 /* InfoPlist.strings in Resources */,
+				58DB1842167D66D000C8E000 /* Credits.rtf in Resources */,
+				58DB1843167D66D000C8E000 /* PCOAnnouncerWindowController.xib in Resources */,
+				58DB1844167D66D000C8E000 /* dsa_pub.pem in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		960A5B9F15535BE300DB4EB9 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -573,6 +649,21 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		58DB1830167D66D000C8E000 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				58DB1831167D66D000C8E000 /* PCOAppDelegate.m in Sources */,
+				58DB1832167D66D000C8E000 /* main.m in Sources */,
+				58DB1833167D66D000C8E000 /* PCOAnnouncerController.m in Sources */,
+				58DB1834167D66D000C8E000 /* PCOAnnouncerWindowController.m in Sources */,
+				58DB1835167D66D000C8E000 /* JSONKit.m in Sources */,
+				58DB1836167D66D000C8E000 /* RKXMLParserLibXML.m in Sources */,
+				58DB1837167D66D000C8E000 /* PCOControlResponseWindow.m in Sources */,
+				58DB1838167D66D000C8E000 /* CAAnimationBlockDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		960A5B9D15535BE300DB4EB9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -687,6 +778,58 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		58DB1848167D66D000C8E000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
+					"\"$(SRCROOT)\"",
+				);
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Mac/Announcer Mac-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				INFOPLIST_FILE = "Announcer Mac copy-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "-DDEBUG";
+				PRODUCT_NAME = "Announcer Mac copy";
+				SDKROOT = macosx;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		58DB1849167D66D000C8E000 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
+					"\"$(SRCROOT)\"",
+				);
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Mac/Announcer Mac-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				INFOPLIST_FILE = "Announcer Mac copy-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_CFLAGS = "-DDEBUG";
+				PRODUCT_NAME = "Announcer Mac copy";
+				SDKROOT = macosx;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
 		960A5BE615535BE300DB4EB9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -712,6 +855,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "";
 			};
 			name = Debug;
 		};
@@ -735,6 +879,7 @@
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "";
 			};
 			name = Release;
 		};
@@ -887,6 +1032,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		58DB1847167D66D000C8E000 /* Build configuration list for PBXNativeTarget "Announcer Mac debug" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				58DB1848167D66D000C8E000 /* Debug */,
+				58DB1849167D66D000C8E000 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		960A5B9B15535BE300DB4EB9 /* Build configuration list for PBXProject "Announcer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

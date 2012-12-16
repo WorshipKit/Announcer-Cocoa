@@ -280,8 +280,11 @@
 
 		NSLog(@"found %lu announcements to show.", [[announcerController currentAnnouncements] count]);
 		
-		//NSRect frameRect = NSMakeRect(100, 100, 340, 280);
+#if defined DEBUG
+		NSRect frameRect = NSMakeRect(100, 100, 340, 280);
+#else
 		NSRect frameRect = [[NSScreen mainScreen] frame];
+#endif
 
 		announcementsWindow = [[PCOControlResponseWindow alloc] initWithContentRect:frameRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:[NSScreen mainScreen]];
 		announcementsWindow.keyPressDelegate = self;
@@ -387,9 +390,20 @@
 		backgroundLayer1.hidden = YES;
 		backgroundLayer2.hidden = YES;
 
+		[backgroundLayer1 removeFromSuperlayer];
+		[backgroundLayer2 removeFromSuperlayer];
+		[activeBackgroundLayer removeFromSuperlayer];
+		backgroundLayer1 = nil;
+		backgroundLayer2 = nil;
+		activeBackgroundLayer = nil;
+
 		clockLayer.hidden = YES;
 
 		bigClockLayer.hidden = NO;
+	}
+	else if (![announcerController shouldShowBigCountdown] && !activeBackgroundLayer)
+	{
+		[self nextSlide];
 	}
 	else
 	{
@@ -421,7 +435,7 @@
 	__block CALayer * layerToFadeIn = nil;
 
 	
-	if (announcerController.currentBackgroundPath)
+	if (announcerController.currentBackgroundPath && ![announcerController shouldShowBigCountdown])
 	{
 		NSError * loadErr = nil;
 
@@ -464,7 +478,7 @@
 		// Define block that gets invoked after
 		// animation starts
 		delegate.blockOnAnimationStarted = ^() {
-			
+
 		};
 		// Define block that gets invoked after
 		// animation succeeds
@@ -481,7 +495,7 @@
 			// Define block that gets invoked after
 			// animation starts
 			delegate.blockOnAnimationStarted = ^() {
-				// your logic goes here ...
+				layerToFadeOut.opacity = 0;
 			};
 			// Define block that gets invoked after
 			// animation succeeds
@@ -497,21 +511,15 @@
 
 				[layerToFadeOut removeFromSuperlayer];
 				layerToFadeOut = nil;
-
-				activeBackgroundLayer = nil;
 			};
 			fadeOutAnimation.delegate = delegate;
 
 			[layerToFadeOut addAnimation:fadeOutAnimation forKey:@"fadeOut"];
-			
-			activeBackgroundLayer = nil;
 
 		};
 		animation.delegate = delegate;
 
 		[layerToFadeIn addAnimation:animation forKey:@"fadeOut"];
-
-		activeBackgroundLayer = nil;
 	}
 	else
 	{
@@ -543,13 +551,17 @@
 			[layerToFadeOut removeFromSuperlayer];
 			layerToFadeOut = nil;
 
+			[backgroundLayer1 removeFromSuperlayer];
+			[backgroundLayer2 removeFromSuperlayer];
+			backgroundLayer1 = nil;
+			backgroundLayer2 = nil;
+
+			[activeBackgroundLayer removeFromSuperlayer];
 			activeBackgroundLayer = nil;
 		};
 		fadeOutAnimation.delegate = delegate;
 
 		[layerToFadeOut addAnimation:fadeOutAnimation forKey:@"fadeOut"];
-
-		activeBackgroundLayer = nil;
 	}
 
 
@@ -604,6 +616,7 @@
 		{
 			[announcerController loadLogoWithCompletionBlock:^{
 
+				/*
 				NSError * loadErr = nil;
 
 				QTMovie * logoMovie = [QTMovie movieWithFile:announcerController.logoPath error:&loadErr];
@@ -618,7 +631,7 @@
 				logoLayer.frame = CGRectMake(activeBackgroundLayer.frame.size.width - 350, 0, 300, 200);
 				
 				[activeBackgroundLayer addSublayer:logoLayer];
-				
+				*/
 
 			} andErrorBlock:^(NSError * error) {
 
@@ -744,6 +757,11 @@
 
 - (void)showBigLogo;
 {
+	if ([[announcerController announcements] count] == 0)
+	{
+		return;
+	}
+
 
 	[titleLayer removeFromSuperlayer];
 	titleLayer = nil;
