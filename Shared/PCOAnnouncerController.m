@@ -20,7 +20,7 @@
 	if (self)
 	{
 		//PCOAnnouncerMainTableViewController * mainTableController = [[PCOAnnouncerMainTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-
+		
 		currentSlideIndex = 0;
 		currentFlickrIndex = 0;
 
@@ -29,9 +29,68 @@
 		clockTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateClock) userInfo:nil repeats:YES];
 		
 		feedUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:60*5 target:self selector:@selector(autoUpdateFeed) userInfo:nil repeats:YES];
+
+		[self loadData];
 	}
 	
 	return self;
+}
+
+
+- (NSString *)saveDataPath;
+{
+	return [[PCOAnnouncerController localCacheDirectoryPath] stringByAppendingPathComponent:@"announcements.dat"];
+}
+
+- (void)saveData;
+{
+	NSMutableDictionary * dataToSave = [NSMutableDictionary dictionary];
+
+	if (self.logoUrl)
+	{
+		[dataToSave setValue:self.logoUrl forKey:@"logoUrl"];
+	}
+	if (self.logoPath)
+	{
+		[dataToSave setValue:self.logoPath forKey:@"logoPath"];
+	}
+	if (self.announcements)
+	{
+		[dataToSave setValue:self.announcements forKey:@"announcements"];
+	}
+	if (self.serviceTimes)
+	{
+		[dataToSave setValue:self.serviceTimes forKey:@"serviceTimes"];
+	}
+	if (self.flickrImageUrls)
+	{
+		[dataToSave setValue:self.flickrImageUrls forKey:@"flickrImageUrls"];
+	}
+
+	if (![dataToSave writeToFile:[self saveDataPath] atomically:YES])
+	{
+		NSLog(@"Error saving");
+	}
+	else
+	{
+		NSLog(@"saved: %@", dataToSave);
+	}
+}
+
+- (void)loadData;
+{
+	NSMutableDictionary * dataToLoad = [NSMutableDictionary dictionaryWithContentsOfFile:[self saveDataPath]];
+
+	if (dataToLoad)
+	{
+		for (NSString * key in [dataToLoad allKeys])
+		{
+			if ([self respondsToSelector:NSSelectorFromString(key)])
+			{
+				[self setValue:[dataToLoad valueForKey:key] forKey:key];
+			}
+		}
+	}
 }
 
 
@@ -377,7 +436,9 @@
 			dispatch_async(dispatch_get_main_queue(), ^{
 				
 				self.announcements = updatedAnnouncements;
-				
+
+				[self saveData];
+
 				completion();
 				
 				dispatch_release(reqQueue); //this executes on main thread

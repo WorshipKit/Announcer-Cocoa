@@ -32,8 +32,6 @@
 
 @interface PCOAnnouncerController : NSObject
 {
-	
-
 	NSTimer * feedUpdateTimer;
 	
 	NSTimer * clockTimer;

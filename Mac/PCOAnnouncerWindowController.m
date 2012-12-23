@@ -253,130 +253,142 @@
 	
 	[announcementsActivitySpinner startAnimation:nil];
 
-	[announcerController loadFeedAndUpdateImagesWithCompletionBlock:^{
-		
-		[announcerController loadFlickrFeedWithCompletionBlock:^{
+	if ([[announcerController announcements] count] > 0)
+	{
+		[self _setupOutput];
+	}
+	else
+	{
+		[announcerController loadFeedAndUpdateImagesWithCompletionBlock:^{
 
-			if ([announcerController shouldShowFlickr] == YES && [[NSScreen screens] count] > 1)
-			{
-				flickrWindow = [[PCOControlResponseWindow alloc] initWithContentRect:[[[NSScreen screens] objectAtIndex:1] frame] styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
-				flickrWindow.keyPressDelegate = self;
-				flickrWindow.delegate = self;
-				[flickrWindow setLevel:NSScreenSaverWindowLevel];
-				[flickrWindow setBackgroundColor:[NSColor blackColor]];
+			[self _setupOutput];
 
-				[flickrWindow makeKeyAndOrderFront:self];
+		} errorBlock:^(NSError * error) {
 
-				[[flickrWindow contentView] setWantsLayer:YES];
+			[announcementsActivitySpinner stopAnimation:nil];
 
-				[self nextPicture];
-			}
-
-		} andErrorBlock:^(NSError * error) {
-
+			NSAlert * errAlert = [NSAlert alertWithError:error];
+			[errAlert runModal];
+			
 		}];
-		
-		[announcementsActivitySpinner stopAnimation:nil];
+	}
 
-		NSLog(@"found %lu announcements to show.", [[announcerController currentAnnouncements] count]);
-		
-#if defined DEBUG
-		NSRect frameRect = NSMakeRect(100, 100, 340, 280);
-#else
-		NSRect frameRect = [[NSScreen mainScreen] frame];
-#endif
+}
 
-		announcementsWindow = [[PCOControlResponseWindow alloc] initWithContentRect:frameRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:[NSScreen mainScreen]];
-		announcementsWindow.keyPressDelegate = self;
-		announcementsWindow.delegate = self;
-		[announcementsWindow setLevel:NSScreenSaverWindowLevel];
-		[announcementsWindow setBackgroundColor:[NSColor blackColor]];
+- (void)_setupOutput;
+{
+	[announcerController loadFlickrFeedWithCompletionBlock:^{
 
-		[announcementsWindow makeKeyAndOrderFront:self];
-
-		[NSCursor setHiddenUntilMouseMoves:YES];
-
-		[[announcementsWindow contentView] setWantsLayer:YES];
-
-
-		clockLayer = [CATextLayer layer];
-
-		clockLayer.frame = [[[announcementsWindow contentView] layer] bounds];
-		
-		clockLayer.string = [announcerController currentClockString];
-
-		float clockSize = 35;
-		NSFont * clockFont = [NSFont fontWithName:@"Myriad Pro Bold" size:clockSize];
-		if (!clockFont)
+		if ([announcerController shouldShowFlickr] == YES && [[NSScreen screens] count] > 1)
 		{
-			clockFont = [NSFont boldSystemFontOfSize:clockSize];
+			flickrWindow = [[PCOControlResponseWindow alloc] initWithContentRect:[[[NSScreen screens] objectAtIndex:1] frame] styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
+			flickrWindow.keyPressDelegate = self;
+			flickrWindow.delegate = self;
+			[flickrWindow setLevel:NSScreenSaverWindowLevel];
+			[flickrWindow setBackgroundColor:[NSColor blackColor]];
+
+			[flickrWindow makeKeyAndOrderFront:self];
+
+			[[flickrWindow contentView] setWantsLayer:YES];
+
+			[self nextPicture];
 		}
-		
-		clockSize = [self actualFontSizeForText:clockLayer.string withFont:clockFont withOriginalSize:clockSize];
-		clockFont = [NSFont fontWithName:clockFont.fontName size:clockSize];
 
-		NSSize clockBoxSize = [clockLayer.string sizeWithAttributes:[NSDictionary dictionaryWithObject:clockFont forKey:NSFontAttributeName]];
-
-		clockLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
-		clockLayer.font = (__bridge CFTypeRef)clockFont;
-		clockLayer.fontSize = clockSize;
-		clockLayer.alignmentMode = kCAAlignmentCenter;
-		clockLayer.shadowOpacity = 1.0;
-
-		clockLayer.frame = CGRectMake(20, 20, [[[announcementsWindow contentView] layer] bounds].size.width - 40, clockBoxSize.height);
-
-		[[[announcementsWindow contentView] layer] addSublayer:clockLayer];
-
-		
-		bigClockLayer = [CATextLayer layer];
-
-		bigClockLayer.frame = [[[announcementsWindow contentView] layer] bounds];
-
-		bigClockLayer.string = @"0:00";
-
-		float bigClockSize = 150;
-		NSFont * bigClockFont = [NSFont fontWithName:@"Myriad Pro Bold" size:bigClockSize];
-		if (!bigClockFont)
-		{
-			bigClockFont = [NSFont boldSystemFontOfSize:bigClockSize];
-		}
-		
-		bigClockSize = [self actualFontSizeForText:bigClockLayer.string withFont:bigClockFont withOriginalSize:bigClockSize];
-		bigClockFont = [NSFont fontWithName:bigClockFont.fontName size:bigClockSize];
-
-		NSSize bigClockBoxSize = [bigClockLayer.string sizeWithAttributes:[NSDictionary dictionaryWithObject:bigClockFont forKey:NSFontAttributeName]];
-
-		bigClockLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
-		bigClockLayer.font = (__bridge CFTypeRef)bigClockFont;
-		bigClockLayer.fontSize = bigClockSize;
-		bigClockLayer.alignmentMode = kCAAlignmentCenter;
-		bigClockLayer.shadowOpacity = 1.0;
-
-		bigClockLayer.frame = CGRectMake(20, ([[[announcementsWindow contentView] layer] bounds].size.height / 2) - (bigClockBoxSize.height / 2), [[[announcementsWindow contentView] layer] bounds].size.width - 40, bigClockBoxSize.height);
-
-		[[[announcementsWindow contentView] layer] addSublayer:bigClockLayer];
-
-		bigClockLayer.hidden = YES;
-		
-
-		if ([[announcerController announcements] count] > 0)
-		{
-			[self nextSlide];
-		}
-		else
-		{
-			[self showBigLogo];
-		}
-		
-	} errorBlock:^(NSError * error) {
-
-		[announcementsActivitySpinner stopAnimation:nil];
-
-		NSAlert * errAlert = [NSAlert alertWithError:error];
-		[errAlert runModal];
+	} andErrorBlock:^(NSError * error) {
 
 	}];
-	
+
+	[announcementsActivitySpinner stopAnimation:nil];
+
+	NSLog(@"found %lu announcements to show.", [[announcerController currentAnnouncements] count]);
+
+#if defined DEBUG
+	NSRect frameRect = NSMakeRect(100, 100, 340, 280);
+#else
+	NSRect frameRect = [[NSScreen mainScreen] frame];
+#endif
+
+	announcementsWindow = [[PCOControlResponseWindow alloc] initWithContentRect:frameRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO screen:[NSScreen mainScreen]];
+	announcementsWindow.keyPressDelegate = self;
+	announcementsWindow.delegate = self;
+	[announcementsWindow setLevel:NSScreenSaverWindowLevel];
+	[announcementsWindow setBackgroundColor:[NSColor blackColor]];
+
+	[announcementsWindow makeKeyAndOrderFront:self];
+
+	[NSCursor setHiddenUntilMouseMoves:YES];
+
+	[[announcementsWindow contentView] setWantsLayer:YES];
+
+
+	clockLayer = [CATextLayer layer];
+
+	clockLayer.frame = [[[announcementsWindow contentView] layer] bounds];
+
+	clockLayer.string = [announcerController currentClockString];
+
+	float clockSize = 35;
+	NSFont * clockFont = [NSFont fontWithName:@"Myriad Pro Bold" size:clockSize];
+	if (!clockFont)
+	{
+		clockFont = [NSFont boldSystemFontOfSize:clockSize];
+	}
+
+	clockSize = [self actualFontSizeForText:clockLayer.string withFont:clockFont withOriginalSize:clockSize];
+	clockFont = [NSFont fontWithName:clockFont.fontName size:clockSize];
+
+	NSSize clockBoxSize = [clockLayer.string sizeWithAttributes:[NSDictionary dictionaryWithObject:clockFont forKey:NSFontAttributeName]];
+
+	clockLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
+	clockLayer.font = (__bridge CFTypeRef)clockFont;
+	clockLayer.fontSize = clockSize;
+	clockLayer.alignmentMode = kCAAlignmentCenter;
+	clockLayer.shadowOpacity = 1.0;
+
+	clockLayer.frame = CGRectMake(20, 20, [[[announcementsWindow contentView] layer] bounds].size.width - 40, clockBoxSize.height);
+
+	[[[announcementsWindow contentView] layer] addSublayer:clockLayer];
+
+
+	bigClockLayer = [CATextLayer layer];
+
+	bigClockLayer.frame = [[[announcementsWindow contentView] layer] bounds];
+
+	bigClockLayer.string = @"0:00";
+
+	float bigClockSize = 150;
+	NSFont * bigClockFont = [NSFont fontWithName:@"Myriad Pro Bold" size:bigClockSize];
+	if (!bigClockFont)
+	{
+		bigClockFont = [NSFont boldSystemFontOfSize:bigClockSize];
+	}
+
+	bigClockSize = [self actualFontSizeForText:bigClockLayer.string withFont:bigClockFont withOriginalSize:bigClockSize];
+	bigClockFont = [NSFont fontWithName:bigClockFont.fontName size:bigClockSize];
+
+	NSSize bigClockBoxSize = [bigClockLayer.string sizeWithAttributes:[NSDictionary dictionaryWithObject:bigClockFont forKey:NSFontAttributeName]];
+
+	bigClockLayer.foregroundColor = CGColorCreateGenericRGB(1, 1, 1, 1.0);
+	bigClockLayer.font = (__bridge CFTypeRef)bigClockFont;
+	bigClockLayer.fontSize = bigClockSize;
+	bigClockLayer.alignmentMode = kCAAlignmentCenter;
+	bigClockLayer.shadowOpacity = 1.0;
+
+	bigClockLayer.frame = CGRectMake(20, ([[[announcementsWindow contentView] layer] bounds].size.height / 2) - (bigClockBoxSize.height / 2), [[[announcementsWindow contentView] layer] bounds].size.width - 40, bigClockBoxSize.height);
+
+	[[[announcementsWindow contentView] layer] addSublayer:bigClockLayer];
+
+	bigClockLayer.hidden = YES;
+
+
+	if ([[announcerController announcements] count] > 0)
+	{
+		[self nextSlide];
+	}
+	else
+	{
+		[self showBigLogo];
+	}
 }
 
 - (void)updateClock;
